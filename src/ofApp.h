@@ -4,6 +4,7 @@
 #include "ofxGui.h"
 #include  "ofxAssimpModelLoader.h"
 #include "Octree.h"
+#include "Player.h"
 #include <glm/gtx/intersect.hpp>
 
 
@@ -39,7 +40,7 @@ class ofApp : public ofBaseApp{
 		glm::vec3 ofApp::getMousePointOnPlane(glm::vec3 p , glm::vec3 n);
 
 		ofEasyCam cam;
-		ofxAssimpModelLoader mars, lander;
+		ofxAssimpModelLoader mars; //lander
 		ofLight light;
 		Box boundingBox, landerBounds;
 		Box testBox;
@@ -83,4 +84,10 @@ class ofApp : public ofBaseApp{
 
 		ofxToggle timingToggle;
 		bool bTimingInfo = true;
+
+		// player
+		Player player;
+
+		// keymap
+		map<int, bool> keymap;
 };
