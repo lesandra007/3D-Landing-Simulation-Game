@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Shape.h"
-#include  "ofxAssimpModelLoader.h"
+#include "ofxAssimpModelLoader.h"
+#include "ParticleEmitter.h"
 
 /* A Shape that can be moved with physics */
 class Player : public DynamicShape {
@@ -13,9 +14,15 @@ public:
 		height = 70.0f;
 		radius = height;
 		// physics
-		speed = 100.0f;  //800 for 2d
-		torque = 50.f;
+		speed = 200.0f;  //100 for lander
+		torque = 100.f;   //50 for lander
 	}
+
+	/* Deallocate the emitter when player is deleted */
+	~Player() {
+		delete emitter;
+	}
+
 	/* Draws the lander */
 	void draw() {
 		ofPushMatrix();
@@ -50,4 +57,5 @@ public:
 	}
 
 	ofxAssimpModelLoader lander;
+	ParticleEmitter* emitter;
 };

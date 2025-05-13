@@ -53,8 +53,10 @@ void ofApp::setup(){
 	mars.setScaleNormalization(false);
 
 	/* Player */
-	player.lander.loadModel("geo/lander.obj");  // Load model
+	//player.lander.loadModel("geo/lander.obj");  // Load model
+	player.lander.loadModel("geo/Missile/Missile.obj");
 	player.lander.setScaleNormalization(false);
+	//player.lander.setRotation(0, -90, 0, 1, 0); // Rotate 90 degrees counterclockwise around Y-axis
 	bLanderLoaded = true;
 	player.setPosition(0, 10, 0); // Set initial position
 

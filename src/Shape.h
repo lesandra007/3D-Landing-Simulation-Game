@@ -114,7 +114,7 @@ public:
 	/* Calculate heading vector by rotating "forward" vector to current angle of shape */
 	glm::vec3 heading() {
 		glm::mat4 rotation = glm::rotate(glm::mat4(1.0), glm::radians(rot), glm::vec3(0, 1, 0));
-		return glm::normalize(rotation * glm::vec4(glm::vec3(0, 0, -1), 0)); // try 0 vs 1 for last parameter
+		return glm::normalize(rotation * glm::vec4(glm::vec3(0, 0, 1), 0)); // try 0 vs 1 for last parameter
 	}
 
 	/* Calcuate the thrust force that propells the player forward in the direction of the heading vector */
