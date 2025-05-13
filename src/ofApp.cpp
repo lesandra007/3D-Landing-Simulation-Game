@@ -33,11 +33,17 @@ void ofApp::setup(){
 	ofEnableSmoothing();
 	ofEnableDepthTest();
 
+	/* Font */
+	if (!font.load("fonts/Electrolize-Regular.ttf", 20)) {
+		cout << "can't load font" << endl;
+		ofExit(0);
+	}
+
 	// setup rudimentary lighting 
 	//
 	initLightingAndMaterials();
 
-	// load terrain
+	/* Terrain */
 	mars.loadModel("geo/mars-low-5x-v2.obj");
 	//mars.loadModel("geo/moon-houdini.obj");
 	// 
@@ -46,11 +52,16 @@ void ofApp::setup(){
 
 	mars.setScaleNormalization(false);
 
-	// load player
+	/* Player */
 	player.lander.loadModel("geo/lander.obj");  // Load model
 	player.lander.setScaleNormalization(false);
 	bLanderLoaded = true;
 	player.setPosition(0, 10, 0); // Set initial position
+
+	/* Altitude */
+	if (bShowAltitude) {
+		sprintf(altitudeStr, "Altitude AGL: %f", getAltitude());
+	}
 
 	// create sliders/toggle for testing
 	//
@@ -127,7 +138,6 @@ void ofApp::update() {
 			//cout << "down arrow" << endl;
 			player.moveBackward();
 		}
-		player.update();
 	}
 
 	/* Collision */
@@ -182,14 +192,17 @@ void ofApp::update() {
 			bReverse = false;
 		}
 	}
+
+	player.update();
+
+	/* Altitude */
+	if (bShowAltitude) {
+		sprintf(altitudeStr, "Altitude AGL: %f", getAltitude());
+	}
 }
 //--------------------------------------------------------------
 void ofApp::draw() {
 	//ofBackground(ofColor::black);
-
-	glDepthMask(false);
-	if (!bHide) gui.draw();
-	glDepthMask(true);
 
 	cam.begin();
 	ofPushMatrix();
@@ -285,6 +298,14 @@ void ofApp::draw() {
 
 	ofPopMatrix();
 	cam.end();
+
+	glDepthMask(false);
+	if (!bHide) gui.draw();
+	if (bShowAltitude) {
+		ofSetColor(ofColor::white);
+		font.drawString(altitudeStr, 500, 50);
+	}
+	glDepthMask(true);
 }
 
 
@@ -326,6 +347,9 @@ void ofApp::keyPressed(int key) {
 	case 'c':
 		if (cam.getMouseInputEnabled()) cam.disableMouseInput();
 		else cam.enableMouseInput();
+		break;
+	case 'e':
+		bShowAltitude = !bShowAltitude;
 		break;
 	case 'F':
 	case 'f':
@@ -568,7 +592,9 @@ void ofApp::mouseExited(int x, int y){
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
-
+	// update window dimension variables
+	windowWidth = w;
+	windowHeight = h;
 }
 
 //--------------------------------------------------------------
@@ -742,4 +768,24 @@ glm::vec3 ofApp::getMousePointOnPlane(glm::vec3 planePt, glm::vec3 planeNorm) {
 		return intersectPoint;
 	}
 	else return glm::vec3(0, 0, 0);
+}
+
+/* Returns player's altitude above ground level */
+float ofApp::getAltitude() {
+	glm::vec3 origin = player.getPosition();
+	glm::vec3 dir = glm::vec3(0, -1, 0); // downward direction
+
+	TreeNode nodeBelow;
+
+	bool aboveTerrain = octree.intersect(Ray(Vector3(origin.x, origin.y, origin.z), Vector3(dir.x, dir.y, dir.z)), octree.root, nodeBelow);
+
+	// if above terrain, get distance between player and terrain
+
+	if (aboveTerrain) {
+		ofVec3f pointRet = octree.mesh.getVertex(nodeBelow.points[0]);
+		return origin.y - pointRet.y;
+	}
+	else {
+		return -1;
+	}
 }

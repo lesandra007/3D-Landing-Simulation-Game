@@ -38,6 +38,7 @@ class ofApp : public ofBaseApp{
 		bool mouseIntersectPlane(ofVec3f planePoint, ofVec3f planeNorm, ofVec3f &point);
 		bool raySelectWithOctree(ofVec3f &pointRet);
 		glm::vec3 ofApp::getMousePointOnPlane(glm::vec3 p , glm::vec3 n);
+		float getAltitude();
 
 		ofEasyCam cam;
 		ofxAssimpModelLoader mars; //lander
@@ -85,9 +86,20 @@ class ofApp : public ofBaseApp{
 		ofxToggle timingToggle;
 		bool bTimingInfo = true;
 
+		// window dimensions
+		int windowWidth;
+		int windowHeight;
+
 		// player
 		Player player;
 
 		// keymap
 		map<int, bool> keymap;
+
+		// altitude
+		bool bShowAltitude = true;
+
+		// fonts
+		ofTrueTypeFont font;
+		char altitudeStr[30];
 };
