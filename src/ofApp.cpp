@@ -138,6 +138,14 @@ void ofApp::update() {
 			//cout << "down arrow" << endl;
 			player.moveBackward();
 		}
+		// move right of the heading vector 
+		if (keymap[OF_KEY_RIGHT]) {
+			player.moveRight();
+		}
+		// move left of the heading vector
+		if (keymap[OF_KEY_LEFT]) {
+			player.moveLeft();
+		}
 	}
 
 	/* Collision */

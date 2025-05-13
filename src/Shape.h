@@ -57,7 +57,7 @@ public:
 	DynamicShape() {
 		// constants 
 		damping = .99;
-		mass = 1;
+		mass = 50;
 
 		// linear 
 		speed = 0;
@@ -87,10 +87,10 @@ public:
 		// remember :  (f = ma) OR (a = 1/m * f)
 		glm::vec3 accel = acceleration;    // start with any acceleration already on the particle
 		accel += (forces * (1.0 / mass));
-		velocity += accel * dt * 0.3f; // constant for faster decelerations
+		velocity += accel * dt; // constant for faster decelerations 0.3
 
 		// add damping
-		velocity *= damping * 0.8f; // constant for faster decelerations
+		velocity *= damping; // constant for faster decelerations 0.8
 
 		/* Angular integration */
 
@@ -103,7 +103,7 @@ public:
 		angVelocity += rotAccel * dt;
 
 		// add damping
-		angVelocity *= damping * 0.8f;
+		angVelocity *= damping;  // constant for faster decelerations 0.8
 
 		// clear forces on particle (they get re-added each step)
 		forces.set(0, 0, 0);
@@ -123,6 +123,12 @@ public:
 		return speed * glm::normalize(heading());
 	}
 
+	glm::vec3 lateralForce() {
+		glm::mat4 rotation = glm::rotate(glm::mat4(1.0), glm::radians(-90.0f), glm::vec3(0, 1, 0));
+		glm::vec3 rightDirection = glm::normalize(rotation * glm::vec4(heading(), 0));
+		return speed * rightDirection;
+	}
+
 	/* Return the lift force that propells the player upward */
 	glm::vec3 liftForce() {
 		return glm::vec3(0, speed, 0);
@@ -138,16 +144,6 @@ public:
 		rotForces -= torque;
 	}
 
-	/* Propel the player forward along the heading vector */
-	void moveForward() {
-		forces += thrustForce() * 0.5f;
-	}
-
-	/* Propel the player backward along the heading vector */
-	void moveBackward() {
-		forces += -thrustForce() * 0.5f;
-	}
-
 	/* Move the player upward */
 	void moveUp() {
 		forces += liftForce();
@@ -156,6 +152,24 @@ public:
 	/* Move the player downward */
 	void moveDown() {
 		forces += -liftForce();
+	}
+
+	/* Propel the player forward along the heading vector */
+	void moveForward() {
+		forces += thrustForce(); // * 0.5
+	}
+
+	/* Propel the player backward along the heading vector */
+	void moveBackward() {
+		forces += -thrustForce();
+	}
+	/* Propel the player right of the heading vector */
+	void moveRight() {
+		forces += lateralForce();
+	}
+	/* Propel the player left of the heading vector */
+	void moveLeft() {
+		forces -= lateralForce();
 	}
 
 	float damping;
