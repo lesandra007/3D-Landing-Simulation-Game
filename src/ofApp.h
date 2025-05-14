@@ -102,4 +102,12 @@ class ofApp : public ofBaseApp{
 		// fonts
 		ofTrueTypeFont font;
 		char altitudeStr[30];
+
+		// fuel
+		ofColor fuelBarColor;
+		ofColor fuelBarBgColor;
+		int fuelBarWidth;
+		int fuelBarHeight;
+		int fuelBarPosX;
+		int fuelBarPosY;
 };

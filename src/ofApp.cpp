@@ -25,7 +25,7 @@ void ofApp::setup(){
 	bLanderLoaded = false;
 	bTerrainSelected = true;
 //	ofSetWindowShape(1024, 768);
-	cam.setDistance(10);
+	cam.setDistance(60);
 	cam.setNearClip(.1);
 	cam.setFov(65.5);   // approx equivalent to 28mm in 35mm format
 	ofSetVerticalSync(true);
@@ -38,6 +38,13 @@ void ofApp::setup(){
 		cout << "can't load font" << endl;
 		ofExit(0);
 	}
+
+	// Initialize fuel bar position and dimensions
+	fuelBarWidth = 20;
+	fuelBarHeight = 200;
+	fuelBarPosX = 50;
+	fuelBarPosY = 100;
+	fuelBarColor = ofColor::green;
 
 	// setup rudimentary lighting 
 	//
@@ -53,8 +60,8 @@ void ofApp::setup(){
 	mars.setScaleNormalization(false);
 
 	/* Player */
-	//player.lander.loadModel("geo/lander.obj");  // Load model
-	player.lander.loadModel("geo/Missile/Missile.obj");
+	player.lander.loadModel("geo/lander.obj");  // Load model
+	//player.lander.loadModel("geo/Missile/Missile.obj");
 	player.lander.setScaleNormalization(false);
 	//player.lander.setRotation(0, -90, 0, 1, 0); // Rotate 90 degrees counterclockwise around Y-axis
 	bLanderLoaded = true;
@@ -70,6 +77,7 @@ void ofApp::setup(){
 	gui.setup();
 	gui.add(numLevels.setup("Number of Octree Levels", 1, 1, 10));
 	gui.add(timingToggle.setup("Timing Info", true));
+	
 	bHide = false;
 
 	// colors
@@ -110,59 +118,67 @@ void ofApp::update() {
 		if (keymap['a']) {
 			//cout << "a key" << endl;
 			player.rotateCounterclockwise();
-			player.diskEmitter.sys->reset();
-			player.diskEmitter.start();
 		}
 		// rotate player clockwise
 		if (keymap['d']) {
 			//cout << "d key" << endl;
 			player.rotateClockwise();
-			player.diskEmitter.sys->reset();
-			player.diskEmitter.start();
 		}
 		// move player upward
 		if (keymap['w']) {
 			//cout << "w key" << endl;
-			player.moveUp();
-			player.diskEmitter.sys->reset();
-			player.diskEmitter.start();
+			if (player.fuel > 0) {
+				player.moveUp();
+				player.fuel -= player.fuelConsumptionRate; // Consume fuel
+				if (player.fuel < 0) player.fuel = 0;
+			}
 		}
 		// rotate player clockwise
 		if (keymap['s']) {
 			//cout << "s key" << endl;
-			player.moveDown();
-			player.diskEmitter.sys->reset();
-			player.diskEmitter.start();
+			if (player.fuel > 0) {
+				player.moveDown();
+				player.fuel -= player.fuelConsumptionRate; // Consume fuel
+				if (player.fuel < 0) player.fuel = 0;
+			}
 		}
 		// move forward along the heading vector
 		if (keymap[OF_KEY_UP]) {
 			// sound
 			//engine.play();
 			//cout << "up arrow" << endl;
-			player.moveForward();
-			player.diskEmitter.sys->reset();
-			player.diskEmitter.start();
+			if (player.fuel > 0) {
+				player.moveForward();
+				player.fuel -= player.fuelConsumptionRate; // Consume fuel
+				if (player.fuel < 0) player.fuel = 0;
+			}
 		}
 		// move backward along the heading vector
 		if (keymap[OF_KEY_DOWN]) {
 			// sound
 			//engine.play();
 			//cout << "down arrow" << endl;
-			player.moveBackward();
-			player.diskEmitter.sys->reset();
-			player.diskEmitter.start();
+			if (player.fuel > 0) {
+				player.moveBackward();
+				player.fuel -= player.fuelConsumptionRate; // Consume fuel
+				if (player.fuel < 0) player.fuel = 0;
+			}
 		}
 		// move right of the heading vector 
 		if (keymap[OF_KEY_RIGHT]) {
-			player.moveRight();
-			player.diskEmitter.sys->reset();
-			player.diskEmitter.start();
+			if (player.fuel > 0) {
+				player.moveRight();
+				player.fuel -= player.fuelConsumptionRate; // Consume fuel
+				if (player.fuel < 0) player.fuel = 0;
+			}
 		}
 		// move left of the heading vector
 		if (keymap[OF_KEY_LEFT]) {
-			player.moveLeft();
-			player.diskEmitter.sys->reset();
-			player.diskEmitter.start();
+			if (player.fuel > 0) {
+				player.moveLeft();
+				player.fuel -= player.fuelConsumptionRate; // Consume fuel
+				if (player.fuel < 0) player.fuel = 0;
+			}
 		}
 	}
 
@@ -287,22 +303,6 @@ void ofApp::draw() {
 	}
 	if (bTerrainSelected) drawAxis(ofVec3f(0, 0, 0));
 
-
-
-	if (bDisplayPoints) {                // display points as an option    
-		glPointSize(3);
-		ofSetColor(ofColor::green);
-		mars.drawVertices();
-	}
-
-	// highlight selected point (draw sphere around selected point)
-	//
-	if (bPointSelected) {
-		ofSetColor(ofColor::blue);
-		ofDrawSphere(selectedPoint, .1);
-	}
-
-
 	// recursively draw octree
 	//
 	ofDisableLighting();
@@ -336,6 +336,43 @@ void ofApp::draw() {
 		ofSetColor(ofColor::white);
 		font.drawString(altitudeStr, 500, 50);
 	}
+
+	if (bLanderLoaded) {
+		// Draw background (gray)
+		ofSetColor(ofColor::gray);
+		ofFill();
+		ofDrawRectangle(fuelBarPosX, fuelBarPosY, fuelBarWidth, fuelBarHeight);
+
+		// Draw fuel level
+		float fuelLevel = player.getFuelPercentage();
+		
+		// Change color based on fuel level
+		if (fuelLevel > 0.6f) {
+			fuelBarColor = ofColor::green;
+		}
+		else if (fuelLevel > 0.3f) {
+			fuelBarColor = ofColor::yellow;
+		}
+		else {
+			fuelBarColor = ofColor::red;
+		}
+
+		// Draw fuel from the bottom of the bar
+		float filledHeight = fuelBarHeight * fuelLevel;
+		float filledY = fuelBarPosY + fuelBarHeight - filledHeight;
+		ofSetColor(fuelBarColor);
+
+		ofDrawRectangle(fuelBarPosX, filledY, fuelBarWidth, filledHeight);
+
+		// Draw border
+		ofNoFill();
+		ofSetColor(ofColor::white);
+		ofDrawRectangle(fuelBarPosX, fuelBarPosY, fuelBarWidth, fuelBarHeight);
+		ofFill();
+
+		font.drawString("Fuel", fuelBarPosX - 20, fuelBarPosY - 7);
+	}
+
 	glDepthMask(true);
 }
 
@@ -509,13 +546,7 @@ void ofApp::mousePressed(int x, int y, int button) {
 
 		Box bounds = Box(Vector3(min.x, min.y, min.z), Vector3(max.x, max.y, max.z));
 
-		// calculate intersection search time
-		uint64_t startIntersectionTime = ofGetSystemTimeMillis();
 		bool hit = bounds.intersect(Ray(Vector3(origin.x, origin.y, origin.z), Vector3(mouseDir.x, mouseDir.y, mouseDir.z)), 0, 10000);
-		uint64_t endIntersectionTime = ofGetSystemTimeMillis();
-		if (bTimingInfo) {
-			cout << "Lander Ray Intersection Search Time: " << endIntersectionTime - startIntersectionTime << endl;
-		}
 		if (hit) {
 			bLanderSelected = true;
 			mouseDownPos = getMousePointOnPlane(player.getPosition(), cam.getZAxis());
@@ -540,12 +571,7 @@ bool ofApp::raySelectWithOctree(ofVec3f &pointRet) {
 	Ray ray = Ray(Vector3(rayPoint.x, rayPoint.y, rayPoint.z),
 		Vector3(rayDir.x, rayDir.y, rayDir.z));
 
-	uint64_t startIntersectionTime = ofGetSystemTimeMillis();
 	pointSelected = octree.intersect(ray, octree.root, selectedNode);
-	uint64_t endIntersectionTime = ofGetSystemTimeMillis();
-	if (bTimingInfo) {
-		cout << "Octree Ray Intersection Search Time: " << endIntersectionTime - startIntersectionTime << endl;
-	}
 
 	if (pointSelected) {
 		pointRet = octree.mesh.getVertex(selectedNode.points[0]);

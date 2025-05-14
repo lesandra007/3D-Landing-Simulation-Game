@@ -9,24 +9,34 @@
 /* A Shape that can be moved with physics */
 class Player : public DynamicShape {
 public:
+	// Fuel system
+	float fuel;
+	float maxFuel;
+	float fuelConsumptionRate;
+
 	// methods
 	Player() {
+		maxFuel = 100.0f;
+		fuel = maxFuel;
+		fuelConsumptionRate = 1.0f;
 		// dimensions
 		width = 60.0f;
 		height = 70.0f;
 		radius = height;
 		// physics
-		speed = 200.0f;  //100 for lander
-		torque = 100.f;   //50 for lander
+		speed = 200.0f;
+		torque = 100.f;
+
+		// First initialize emitter.sys to make sure it exists before adding forces
+		emitter.sys = new ParticleSystem();
 
 		/* Emitter and Particles */
-		// set up the emitter forces
+		// then set up the emitter forces
 		turbForce = new TurbulenceForce(ofVec3f(-20, -20, -20), ofVec3f(20, 20, 20));
 		gravityForce = new GravityForce(ofVec3f(0, -10, 0));
 		radialForce = new ImpulseRadialForce(5);
 
-
-		/* Collision Radial Emitter */
+		// Now add forces to the properly initialized system
 		emitter.sys->addForce(turbForce);
 		emitter.sys->addForce(gravityForce);
 		emitter.sys->addForce(radialForce);
@@ -34,51 +44,25 @@ public:
 		// set up emitter
 		emitter.speed = speed;
 		emitter.torque = torque;
-
-		emitter.setPosition(getCenter());
+		emitter.setPosition(ofVec3f(0, 0, 0)); // Start with a safe position
 		emitter.setVelocity(velocity);
 		emitter.acceleration = acceleration;
 		emitter.forces = forces;
-		
-
 		emitter.rot = rot;
 		emitter.angVelocity = angVelocity;
 		emitter.angAcceleration = angAcceleration;
 		emitter.rotForces = rotForces;
-
 		emitter.setOneShot(true);
 		emitter.setEmitterType(RadialEmitter);
 		emitter.setGroupSize(20);
 		emitter.visible = false;
 
-		/* Thrust Disk Emitter */
-		diskEmitter.sys->addForce(gravityForce);
-
-		// set up emitter
-		diskEmitter.speed = speed;
-		diskEmitter.torque = torque;
-
-		diskEmitter.radius = 2;
-
-		diskEmitter.setPosition(pos);
-		diskEmitter.setVelocity(velocity);
-		diskEmitter.acceleration = acceleration;
-		diskEmitter.forces = forces;
-
-
-		diskEmitter.rot = rot;
-		diskEmitter.angVelocity = angVelocity;
-		diskEmitter.angAcceleration = angAcceleration;
-		diskEmitter.rotForces = rotForces;
-
-		diskEmitter.setOneShot(true);
-		diskEmitter.setEmitterType(DiskEmitter);
-		diskEmitter.setGroupSize(100);
-		diskEmitter.setParticleRadius(.1);
-		diskEmitter.visible = false;
-		
 		// visibility: true if hasnt collided, otherwise false
 		visible = true;
+	}
+
+	float getFuelPercentage() {
+		return fuel / maxFuel;
 	}
 
 	/* Draws the lander */
@@ -89,7 +73,6 @@ public:
 			lander.drawFaces();
 		}
 		emitter.draw();
-		diskEmitter.draw();
 		ofPopMatrix();
 
 	}
@@ -134,36 +117,21 @@ public:
 		if (ofGetFrameRate() != 0) {
 			integrate();
 			ofVec3f center = getCenter();
-
-			/* Collision Radial Emitter */
-			// emitter movement
 			emitter.forces = forces;
+
 			emitter.rotForces = rotForces;
 			emitter.integrate();
-
-			// spawn particles accordingly
 			emitter.update();
-
-			/* Thrust Disk Emitter */
-
-			// emitter movement
-			diskEmitter.forces = forces;
-			diskEmitter.rotForces = rotForces;
-			diskEmitter.integrate();
-
-			// spawn particles accordingly
-			if (visible) {
-				diskEmitter.update();
-			}
-			
 		}
 	}
 
 	ofVec3f getCenter() {
+		if (!lander.hasMeshes()) {
+			return ofVec3f(pos.x, pos.y, pos.z);  // Return position if model not loaded
+		}
 		ofVec3f min = lander.getSceneMin();
 		ofVec3f max = lander.getSceneMax();
 		Box bounds = Box(Vector3(min.x, min.y, min.z), Vector3(max.x, max.y, max.z));
-
 		Vector3 center = bounds.center();
 		ofVec3f centerNew(center.x(), center.y() + pos.y, center.z());
 		return centerNew;
@@ -173,7 +141,6 @@ public:
 	bool visible;
 
 	ParticleEmitter emitter;
-	ParticleEmitter diskEmitter;
 	TurbulenceForce* turbForce;
 	GravityForce* gravityForce;
 	ImpulseRadialForce* radialForce;
