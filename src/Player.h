@@ -25,6 +25,8 @@ public:
 		gravityForce = new GravityForce(ofVec3f(0, -10, 0));
 		radialForce = new ImpulseRadialForce(5);
 
+
+		/* Collision Radial Emitter */
 		emitter.sys->addForce(turbForce);
 		emitter.sys->addForce(gravityForce);
 		emitter.sys->addForce(radialForce);
@@ -48,6 +50,32 @@ public:
 		emitter.setEmitterType(RadialEmitter);
 		emitter.setGroupSize(20);
 		emitter.visible = false;
+
+		/* Thrust Disk Emitter */
+		diskEmitter.sys->addForce(gravityForce);
+
+		// set up emitter
+		diskEmitter.speed = speed;
+		diskEmitter.torque = torque;
+
+		diskEmitter.radius = 2;
+
+		diskEmitter.setPosition(pos);
+		diskEmitter.setVelocity(velocity);
+		diskEmitter.acceleration = acceleration;
+		diskEmitter.forces = forces;
+
+
+		diskEmitter.rot = rot;
+		diskEmitter.angVelocity = angVelocity;
+		diskEmitter.angAcceleration = angAcceleration;
+		diskEmitter.rotForces = rotForces;
+
+		diskEmitter.setOneShot(true);
+		diskEmitter.setEmitterType(DiskEmitter);
+		diskEmitter.setGroupSize(100);
+		diskEmitter.setParticleRadius(.1);
+		diskEmitter.visible = false;
 		
 		// visibility: true if hasnt collided, otherwise false
 		visible = true;
@@ -61,6 +89,7 @@ public:
 			lander.drawFaces();
 		}
 		emitter.draw();
+		diskEmitter.draw();
 		ofPopMatrix();
 
 	}
@@ -106,13 +135,27 @@ public:
 			integrate();
 			ofVec3f center = getCenter();
 
-			cout << "pos y: " << pos.y << endl;
-
+			/* Collision Radial Emitter */
+			// emitter movement
 			emitter.forces = forces;
-
 			emitter.rotForces = rotForces;
 			emitter.integrate();
+
+			// spawn particles accordingly
 			emitter.update();
+
+			/* Thrust Disk Emitter */
+
+			// emitter movement
+			diskEmitter.forces = forces;
+			diskEmitter.rotForces = rotForces;
+			diskEmitter.integrate();
+
+			// spawn particles accordingly
+			if (visible) {
+				diskEmitter.update();
+			}
+			
 		}
 	}
 
@@ -130,6 +173,7 @@ public:
 	bool visible;
 
 	ParticleEmitter emitter;
+	ParticleEmitter diskEmitter;
 	TurbulenceForce* turbForce;
 	GravityForce* gravityForce;
 	ImpulseRadialForce* radialForce;

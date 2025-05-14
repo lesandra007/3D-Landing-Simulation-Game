@@ -110,21 +110,29 @@ void ofApp::update() {
 		if (keymap['a']) {
 			//cout << "a key" << endl;
 			player.rotateCounterclockwise();
+			player.diskEmitter.sys->reset();
+			player.diskEmitter.start();
 		}
 		// rotate player clockwise
 		if (keymap['d']) {
 			//cout << "d key" << endl;
 			player.rotateClockwise();
+			player.diskEmitter.sys->reset();
+			player.diskEmitter.start();
 		}
 		// move player upward
 		if (keymap['w']) {
 			//cout << "w key" << endl;
 			player.moveUp();
+			player.diskEmitter.sys->reset();
+			player.diskEmitter.start();
 		}
 		// rotate player clockwise
 		if (keymap['s']) {
 			//cout << "s key" << endl;
 			player.moveDown();
+			player.diskEmitter.sys->reset();
+			player.diskEmitter.start();
 		}
 		// move forward along the heading vector
 		if (keymap[OF_KEY_UP]) {
@@ -132,6 +140,8 @@ void ofApp::update() {
 			//engine.play();
 			//cout << "up arrow" << endl;
 			player.moveForward();
+			player.diskEmitter.sys->reset();
+			player.diskEmitter.start();
 		}
 		// move backward along the heading vector
 		if (keymap[OF_KEY_DOWN]) {
@@ -139,14 +149,20 @@ void ofApp::update() {
 			//engine.play();
 			//cout << "down arrow" << endl;
 			player.moveBackward();
+			player.diskEmitter.sys->reset();
+			player.diskEmitter.start();
 		}
 		// move right of the heading vector 
 		if (keymap[OF_KEY_RIGHT]) {
 			player.moveRight();
+			player.diskEmitter.sys->reset();
+			player.diskEmitter.start();
 		}
 		// move left of the heading vector
 		if (keymap[OF_KEY_LEFT]) {
 			player.moveLeft();
+			player.diskEmitter.sys->reset();
+			player.diskEmitter.start();
 		}
 	}
 
