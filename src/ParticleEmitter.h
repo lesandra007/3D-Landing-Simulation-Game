@@ -20,19 +20,26 @@ public:
 	void stop();
 	void setLifespan(const float life)   { lifespan = life; }
 	void setVelocity(const ofVec3f &vel) { velocity = vel; }
+	void setPosition(const glm::vec3& position) { pos = position; }
 	void setRate(const float r) { rate = r; }
 	void setParticleRadius(const float r) { particleRadius = r; }
 	void setEmitterType(EmitterType t) { type = t; }
+	void setGroupSize(int s) { groupSize = s; }
+	void setOneShot(bool s) { oneShot = s; }
 	void update();
+	void spawn(float time);
 	ParticleSystem *sys;
 	float rate;         // per sec
-	ofVec3f velocity;
+	bool oneShot;
+	bool fired;
+	ofVec3f particleVelocity;
 	float lifespan;     // sec
 	bool started;
 	float lastSpawned;  // ms
 	float particleRadius;
 	float radius;
 	bool visible;
+	int groupSize;      // number of particles to spawn in a group
 	bool createdSys;
 	EmitterType type;
 };

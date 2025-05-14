@@ -47,7 +47,7 @@ void ofApp::setup(){
 	mars.loadModel("geo/mars-low-5x-v2.obj");
 	//mars.loadModel("geo/moon-houdini.obj");
 	// 
-	//mars.loadModel("geo/Mountain/Mountain.obj");
+	//mars.loadModel("geo/Mountain/Mountain.fbx");
 	//mars.loadModel("geo/Park/Park.obj");
 
 	mars.setScaleNormalization(false);
@@ -207,7 +207,13 @@ void ofApp::update() {
 
 	/* Altitude */
 	if (bShowAltitude) {
-		sprintf(altitudeStr, "Altitude AGL: %f", getAltitude());
+		float agl = getAltitude();
+		if (agl == -1) {
+			sprintf(altitudeStr, "Altitude AGL: -------");
+		}
+		else {
+			sprintf(altitudeStr, "Altitude AGL: %f", getAltitude());
+		}
 	}
 }
 //--------------------------------------------------------------
@@ -305,7 +311,6 @@ void ofApp::draw() {
 		ofSetColor(ofColor::lightGreen);
 		ofDrawSphere(p, .02 * d.length());
 	}
-
 	ofPopMatrix();
 	cam.end();
 
@@ -375,6 +380,9 @@ void ofApp::keyPressed(int key) {
 	case 'O':
 	case 'o':
 		bDisplayOctree = !bDisplayOctree;
+		break;
+	case 'q':
+		player.breakPlayer();
 		break;
 	case 'r':
 		cam.reset();
@@ -782,6 +790,9 @@ glm::vec3 ofApp::getMousePointOnPlane(glm::vec3 planePt, glm::vec3 planeNorm) {
 
 /* Returns player's altitude above ground level */
 float ofApp::getAltitude() {
+	// return negative if player has exploded
+	if (!player.isVisible()) { return -1; }
+
 	glm::vec3 origin = player.getPosition();
 	glm::vec3 dir = glm::vec3(0, -1, 0); // downward direction
 

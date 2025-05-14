@@ -8,7 +8,10 @@
 //  Pure Virtual Function Class - must be subclassed to create new forces.
 //
 class ParticleForce {
+protected:
 public:
+	bool applyOnce = false;
+	bool applied = false;
 	virtual void updateForce(Particle *) = 0;
 };
 
@@ -18,6 +21,8 @@ public:
 	void addForce(ParticleForce *);
 	void remove(int);
 	void update();
+	void setLifespan(float);
+	void reset();
 	int removeNear(const ofVec3f & point, float dist);
 	void draw();
 	vector<Particle> particles;
@@ -39,5 +44,12 @@ class TurbulenceForce : public ParticleForce {
 	ofVec3f tmin, tmax;
 public:
 	TurbulenceForce(const ofVec3f & min, const ofVec3f &max);
+	void updateForce(Particle *);
+};
+
+class ImpulseRadialForce : public ParticleForce {
+	float magnitude;
+public:
+	ImpulseRadialForce(float magnitude); 
 	void updateForce(Particle *);
 };

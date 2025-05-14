@@ -29,14 +29,17 @@ ParticleEmitter::~ParticleEmitter() {
 
 void ParticleEmitter::init() {
 	rate = 1;
-	velocity = ofVec3f(0, 20, 0);
+	particleVelocity = ofVec3f(0, 5, 0);
 	lifespan = 3;
 	started = false;
+	oneShot = false;
+	fired = false;
 	lastSpawned = 0;
 	radius = 1;
-	particleRadius = .1;
+	particleRadius = 1;
 	visible = true;
 	type = DirectionalEmitter;
+	groupSize = 1;
 }
 
 
@@ -49,6 +52,8 @@ void ParticleEmitter::draw() {
 			break;
 		case SphereEmitter:
 		case RadialEmitter:
+			cout << "center y: " << pos.y << endl;
+
 			ofDrawSphere(pos, radius/10);  // just draw a small sphere as a placeholder
 			break;
 		default:
@@ -64,43 +69,70 @@ void ParticleEmitter::start() {
 
 void ParticleEmitter::stop() {
 	started = false;
+	fired = false;
 }
 void ParticleEmitter::update() {
-	if (!started) return;
 
 	float time = ofGetElapsedTimeMillis();
+	if (oneShot && started) {
+		if (!fired) {
+			// spawn a new particle(s)
+			//
+			for (int i = 0; i < groupSize; i++)
+				spawn(time);
 
-	if ((time - lastSpawned) > (1000.0 / rate)) {
-
-		// spawn a new particle
-		//
-		Particle particle;
-
-		// set initial velocity and position
-		// based on emitter type
-		//
-		switch (type) {
-		case RadialEmitter:
-	//		break;
-		case SphereEmitter:
-	//		break;
-		case DirectionalEmitter:
-			particle.velocity = velocity;
-			particle.position.set(pos);
-			break;
+			lastSpawned = time;
 		}
+		fired = true;
+		stop();
+	}
 
-		// other particle attributes
-		//
-		particle.lifespan = lifespan;
-		particle.birthtime = time;
-		particle.radius = particleRadius;
+	else if (((time - lastSpawned) > (1000.0 / rate)) && started) {
 
-		// add to system
+		// spawn a new particle(s)
 		//
-		sys->add(particle);
+		for (int i= 0; i < groupSize; i++)
+			spawn(time);
+	
 		lastSpawned = time;
 	}
+
 	sys->update();
 }
 
+// spawn a single particle.  time is current time of birth
+//
+void ParticleEmitter::spawn(float time) {
+
+	Particle particle;
+
+	// set initial velocity and position
+	// based on emitter type
+	//
+	switch (type) {
+	case RadialEmitter:
+	{
+		ofVec3f dir = ofVec3f(ofRandom(-1, 1), ofRandom(-1, 1), ofRandom(-1, 1));
+		float speed = particleVelocity.length() * 0.1;
+		particle.velocity = dir.getNormalized() * speed;
+		particle.position.set(pos);
+	}
+	break;
+	case SphereEmitter:
+		break;
+	case DirectionalEmitter:
+		particle.velocity = particleVelocity;
+		particle.position.set(pos);
+		break;
+	}
+
+	// other particle attributes
+	//
+	particle.lifespan = lifespan;
+	particle.birthtime = time;
+	particle.radius = particleRadius;
+
+	// add to system
+	//
+	sys->add(particle);
+}

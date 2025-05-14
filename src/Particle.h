@@ -21,7 +21,6 @@ public:
 	void    draw();
 	float   age();        // sec
 	ofColor color;
-	// add setters
 };
 
 
