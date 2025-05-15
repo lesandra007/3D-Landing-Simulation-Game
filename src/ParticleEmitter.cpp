@@ -104,9 +104,6 @@ void ParticleEmitter::draw() {
 			ofEnableAlphaBlending();
 			break;
 		case RadialEmitter:
-			// this makes everything look glowy :)
-			//ofEnableBlendMode(OF_BLENDMODE_ADD);
-			//ofEnablePointSprites();
 			shader.begin();
 			//ofDrawSphere(pos, radius/10);  // just draw a small sphere as a placeholder
 			particleTex.bind();
@@ -184,7 +181,7 @@ void ParticleEmitter::spawn(float time) {
 	break;
 	case SphereEmitter:
 		break;
-	case DiskEmitter: 
+	case DiskEmitter:
 	{
 		float speed = particleVelocity.length() * 0.1;
 		particle.velocity = ofVec3f(0, -speed, 0);

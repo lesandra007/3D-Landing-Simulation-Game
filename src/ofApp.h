@@ -5,6 +5,7 @@
 #include  "ofxAssimpModelLoader.h"
 #include "Octree.h"
 #include "Player.h"
+#include "CameraSystem.h"
 #include <glm/gtx/intersect.hpp>
 
 
@@ -25,8 +26,6 @@ class ofApp : public ofBaseApp{
 		void mouseEntered(int x, int y);
 		void mouseExited(int x, int y);
 		void windowResized(int w, int h);
-		void dragEvent2(ofDragInfo dragInfo);
-		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		void drawAxis(ofVec3f);
 		void initLightingAndMaterials();
@@ -40,7 +39,10 @@ class ofApp : public ofBaseApp{
 		glm::vec3 ofApp::getMousePointOnPlane(glm::vec3 p , glm::vec3 n);
 		float getAltitude();
 
-		ofEasyCam cam;
+		CameraSystem cameraSystem = CameraSystem();
+		void switchCameraMode(CameraSystem::CameraMode mode);
+		//void drawCameraInfo();
+
 		ofxAssimpModelLoader mars; //lander
 		ofLight light;
 		Box boundingBox, landerBounds;
@@ -103,5 +105,11 @@ class ofApp : public ofBaseApp{
 		ofTrueTypeFont font;
 		char altitudeStr[30];
 
-		
+		// fuel
+		ofColor fuelBarColor;
+		ofColor fuelBarBgColor;
+		int fuelBarWidth;
+		int fuelBarHeight;
+		int fuelBarPosX;
+		int fuelBarPosY;
 };
