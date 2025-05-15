@@ -20,10 +20,11 @@ public:
 		torque = 100.f;   //50 for lander
 
 		/* Emitter and Particles */
+
 		// set up the emitter forces
 		turbForce = new TurbulenceForce(ofVec3f(-20, -20, -20), ofVec3f(20, 20, 20));
 		gravityForce = new GravityForce(ofVec3f(0, -10, 0));
-		radialForce = new ImpulseRadialForce(5);
+		radialForce = new ImpulseRadialForce(20);
 
 
 		/* Collision Radial Emitter */
@@ -32,8 +33,9 @@ public:
 		emitter.sys->addForce(radialForce);
 
 		// set up emitter
-		emitter.speed = speed;
+		emitter.speed = speed * 5;
 		emitter.torque = torque;
+		emitter.mass = 1;
 
 		emitter.setPosition(getCenter());
 		emitter.setVelocity(velocity);
@@ -48,15 +50,16 @@ public:
 
 		emitter.setOneShot(true);
 		emitter.setEmitterType(RadialEmitter);
-		emitter.setGroupSize(20);
-		emitter.visible = false;
+		emitter.setGroupSize(5000);
+		emitter.visible = true;
 
 		/* Thrust Disk Emitter */
 		diskEmitter.sys->addForce(gravityForce);
 
 		// set up emitter
-		diskEmitter.speed = speed;
+		diskEmitter.speed = 50;
 		diskEmitter.torque = torque;
+		diskEmitter.mass = 10;
 
 		diskEmitter.radius = 2;
 
@@ -73,9 +76,9 @@ public:
 
 		diskEmitter.setOneShot(true);
 		diskEmitter.setEmitterType(DiskEmitter);
-		diskEmitter.setGroupSize(100);
-		diskEmitter.setParticleRadius(.1);
-		diskEmitter.visible = false;
+		diskEmitter.setGroupSize(1000);
+		diskEmitter.setParticleRadius(1);
+		diskEmitter.visible = true;
 		
 		// visibility: true if hasnt collided, otherwise false
 		visible = true;
@@ -111,12 +114,13 @@ public:
 	/* Set player visibility */
 	void setVisible(bool state) {
 		visible = state;
+		diskEmitter.visible = state;
 	}
 
 	/* Simulate a collision */
 	void breakPlayer() {
 		cout << "breakPlayer" << endl;
-		visible = false;
+		setVisible(false);
 		emitter.sys->reset();
 		emitter.start();
 	}

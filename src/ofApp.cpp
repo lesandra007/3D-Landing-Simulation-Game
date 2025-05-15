@@ -47,8 +47,9 @@ void ofApp::setup(){
 	mars.loadModel("geo/mars-low-5x-v2.obj");
 	//mars.loadModel("geo/moon-houdini.obj");
 	// 
-	//mars.loadModel("geo/Mountain/Mountain.fbx");
+	//mars.loadModel("geo/Mountain/Mountain.obj");
 	//mars.loadModel("geo/Park/Park.obj");
+	//mars.loadModel("geo/Operation/Operation.obj");
 
 	mars.setScaleNormalization(false);
 

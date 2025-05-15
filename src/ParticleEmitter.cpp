@@ -17,6 +17,7 @@ ParticleEmitter::ParticleEmitter(ParticleSystem *s) {
 	}
 	sys = s;
 	createdSys = false;
+	setup();
 	init();
 }
 
@@ -25,6 +26,25 @@ ParticleEmitter::~ParticleEmitter() {
 	// deallocate particle system if emitter created one internally
 	//
 	if (createdSys) delete sys;
+}
+
+// load vertex buffer in preparation for rendering
+//
+void ParticleEmitter::loadVbo() {
+	if (sys->particles.size() < 1) return;
+
+	vector<ofVec3f> sizes;
+	vector<ofVec3f> points;
+	for (int i = 0; i < sys->particles.size(); i++) {
+		points.push_back(sys->particles[i].position);
+		sizes.push_back(ofVec3f(particleRadius));
+	}
+	// upload the data to the vbo
+	//
+	int total = (int)points.size();
+	vbo.clear();
+	vbo.setVertexData(&points[0], total, GL_STATIC_DRAW);
+	vbo.setNormalData(&sizes[0], total, GL_STATIC_DRAW);
 }
 
 void ParticleEmitter::init() {
@@ -42,26 +62,69 @@ void ParticleEmitter::init() {
 	groupSize = 1;
 }
 
+void ParticleEmitter::setup() {
+	/* Particle Rendering with Shaders */
+
+	// texture loading
+	ofDisableArbTex();     // disable rectangular textures
+
+	if (!ofLoadImage(particleTex, "images/dot.png")) {
+		cout << "Particle Texture File: " << "images/dot.png" << " not found" << endl;
+		ofExit();
+	}
+
+	// shader loading
+	shader.load("shaders/shader.vert", "shaders/shader.frag");
+}
+
 
 
 void ParticleEmitter::draw() {
 	if (visible) {
+		loadVbo();
 		switch (type) {
 		case DirectionalEmitter:
 			ofDrawSphere(pos, radius/10);  // just draw a small sphere for point emitters 
 			break;
 		case SphereEmitter:
 		case DiskEmitter:
-			ofDrawSphere(pos, radius / 2);
+			// this makes everything look glowy :)
+			ofEnableBlendMode(OF_BLENDMODE_ADD);
+			ofEnablePointSprites();
+			shader.begin();
+			//ofDrawSphere(pos, radius/10);  // just draw a small sphere as a placeholder
+			particleTex.bind();
+			vbo.draw(GL_POINTS, 0, (int)sys->particles.size());
+			particleTex.unbind();
+
+			shader.end();
+
+			ofDisablePointSprites();
+			ofDisableBlendMode();
+			ofEnableAlphaBlending();
 			break;
 		case RadialEmitter:
-			ofDrawSphere(pos, radius/10);  // just draw a small sphere as a placeholder
+			// this makes everything look glowy :)
+			//ofEnableBlendMode(OF_BLENDMODE_ADD);
+			//ofEnablePointSprites();
+			shader.begin();
+			//ofDrawSphere(pos, radius/10);  // just draw a small sphere as a placeholder
+			particleTex.bind();
+			vbo.draw(GL_POINTS, 0, (int)sys->particles.size());
+			particleTex.unbind();
+
+			shader.end();
+
+			ofDisablePointSprites();
+			ofDisableBlendMode();
+			ofEnableAlphaBlending();
 			break;
 		default:
 			break;
 		}
+		//sys->draw();
 	}
-	sys->draw();  
+	 
 }
 void ParticleEmitter::start() {
 	started = true;
@@ -114,7 +177,7 @@ void ParticleEmitter::spawn(float time) {
 	case RadialEmitter:
 	{
 		ofVec3f dir = ofVec3f(ofRandom(-1, 1), ofRandom(-1, 1), ofRandom(-1, 1));
-		float speed = particleVelocity.length() * 0.1;
+		float speed = particleVelocity.length();
 		particle.velocity = dir.getNormalized() * speed;
 		particle.position.set(pos);
 	}
@@ -146,6 +209,7 @@ void ParticleEmitter::spawn(float time) {
 	particle.lifespan = lifespan;
 	particle.birthtime = time;
 	particle.radius = particleRadius;
+	particle.mass = mass;
 
 	// add to system
 	//

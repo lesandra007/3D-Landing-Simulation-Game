@@ -102,4 +102,6 @@ class ofApp : public ofBaseApp{
 		// fonts
 		ofTrueTypeFont font;
 		char altitudeStr[30];
+
+		
 };

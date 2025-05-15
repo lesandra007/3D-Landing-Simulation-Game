@@ -14,7 +14,9 @@ public:
 	ParticleEmitter();
 	ParticleEmitter(ParticleSystem *s);
 	~ParticleEmitter();
-	void init(); 
+	void loadVbo();
+	void init();
+	void setup();
 	void draw();
 	void start();
 	void stop();
@@ -42,4 +44,12 @@ public:
 	int groupSize;      // number of particles to spawn in a group
 	bool createdSys;
 	EmitterType type;
+
+	/* Particle Rendering */
+	// textures
+	ofTexture  particleTex;
+
+	// shader
+	ofVbo vbo;
+	ofShader shader;
 };
