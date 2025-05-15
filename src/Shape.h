@@ -42,7 +42,7 @@ public:
 		glm::mat4 S = glm::scale(glm::mat4(1.0), scale);
 		return T*R*S;
 	}
-	glm::vec3 pos;
+	glm::vec3 pos = glm::vec3(0,100,0);
 	float rot = 0.0;    // degrees 
 	glm::vec3 scale = glm::vec3(1, 1, 1);
 

@@ -49,10 +49,10 @@ void ofApp::setup(){
 	initLightingAndMaterials();
 
 	/* Terrain */
-	mars.loadModel("geo/mars-low-5x-v2.obj");
+	//mars.loadModel("geo/mars-low-5x-v2.obj");
 	//mars.loadModel("geo/moon-houdini.obj");
 	//mars.loadModel("geo/Mountain/Mountain.obj");
-	//mars.loadModel("geo/Park/Park.obj");
+	mars.loadModel("geo/Park/Park.obj");
 	//mars.loadModel("geo/Operation/Operation.obj");
 
 	mars.setScaleNormalization(false);
@@ -60,10 +60,13 @@ void ofApp::setup(){
 	/* Player */
 	//player.lander.loadModel("geo/lander.obj");  // Load model
 	player.lander.loadModel("geo/Missile/Missile.obj");
+	player.setPosition(0, 10, 0);
+	float scaleFactor = 0.25;
+	player.scale = glm::vec3(scaleFactor, scaleFactor, scaleFactor);
 	player.lander.setScaleNormalization(false);
 	//player.lander.setRotation(0, -90, 0, 1, 0); // Rotate 90 degrees counterclockwise around Y-axis
 	bLanderLoaded = true;
-	player.setPosition(0, 10, 0); // Set initial position
+
 
 	/* Altitude */
 	if (bShowAltitude) {
@@ -204,8 +207,9 @@ void ofApp::update() {
 		}
 		else if (cameraSystem.getCurrentMode() == CameraSystem::CameraMode::ONBOARD_CAMERA) {
 			glm::vec3 playerPos = player.getPosition();
+			cout << playerPos;
 			glm::vec3 playerForward = player.heading();
-			glm::vec3 playerUp = glm::vec3(0, 1, 0); // Assuming Y is up
+			glm::vec3 playerUp = glm::vec3(0, 1, 0);
 			cameraSystem.updateOnboardCamera(playerPos, playerForward, playerUp);
 		}
 	}
@@ -757,6 +761,7 @@ void ofApp::switchCameraMode(CameraSystem::CameraMode mode) {
 	if (mode == CameraSystem::CameraMode::ONBOARD_CAMERA && bLanderLoaded) {
 		// Update onboard camera position and orientation based on player
 		glm::vec3 playerPos = player.getPosition();
+		cout << playerPos;
 		glm::vec3 playerForward = player.heading();
 		glm::vec3 playerUp = glm::vec3(0, 1, 0); // Assuming Y is up
 		cameraSystem.updateOnboardCamera(playerPos, playerForward, playerUp);

@@ -45,8 +45,9 @@ public:
 		emitter.speed = speed * 5;
 		emitter.torque = torque;
 		emitter.mass = 1;
-		emitter.setPosition(getCenter());
-		//emitter.setPosition(ofVec3f(0, 0, 0)); // Start with a safe position
+		ofVec3f center = getCenter();
+		emitter.setPosition(glm::vec3(center.x, center.y - 100, center.z));
+		//emitter.setPosition(ofVec3f(0, 100, 0)); // Start with a safe position
 		emitter.setVelocity(velocity);
 		emitter.acceleration = acceleration;
 		emitter.forces = forces;
@@ -70,7 +71,7 @@ public:
 
 		diskEmitter.radius = 2;
 
-		diskEmitter.setPosition(pos);
+		diskEmitter.setPosition(glm::vec3(pos.x, pos.y-100, pos.z));
 		diskEmitter.setVelocity(velocity);
 		diskEmitter.acceleration = acceleration;
 		diskEmitter.forces = forces;
