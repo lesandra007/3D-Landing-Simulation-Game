@@ -51,10 +51,9 @@ void ParticleEmitter::draw() {
 			ofDrawSphere(pos, radius/10);  // just draw a small sphere for point emitters 
 			break;
 		case SphereEmitter:
-		case DiskEmitter:
-			ofDrawSphere(pos, radius / 2);
-			break;
 		case RadialEmitter:
+			cout << "center y: " << pos.y << endl;
+
 			ofDrawSphere(pos, radius/10);  // just draw a small sphere as a placeholder
 			break;
 		default:
@@ -121,20 +120,6 @@ void ParticleEmitter::spawn(float time) {
 	break;
 	case SphereEmitter:
 		break;
-	case DiskEmitter: 
-	{
-		float speed = particleVelocity.length() * 0.1;
-		particle.velocity = ofVec3f(0, -speed, 0);
-
-		// emit from a disk shape instead of a singular point
-		float angle = ofRandom(0, TWO_PI); // Random angle in a full circle
-		float distance = ofRandom(0, radius); // Random distance from center
-		float x = cos(angle) * distance;
-		float z = sin(angle) * distance;
-
-		particle.position.set(ofVec3f(x, pos.y, z)); // Ensures a circular area
-		break;
-	}
 	case DirectionalEmitter:
 		particle.velocity = particleVelocity;
 		particle.position.set(pos);
