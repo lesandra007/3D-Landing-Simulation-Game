@@ -44,7 +44,7 @@ public:
 		// set up emitter
 		emitter.speed = speed;
 		emitter.torque = torque;
-		emitter.setPosition(ofVec3f(0, 0, 0)); // Start with a safe position
+		emitter.setPosition(ofVec3f(0, 100, 0)); // Start with a safe position
 		emitter.setVelocity(velocity);
 		emitter.acceleration = acceleration;
 		emitter.forces = forces;
