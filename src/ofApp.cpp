@@ -51,16 +51,16 @@ void ofApp::setup(){
 	/* Terrain */
 	//mars.loadModel("geo/mars-low-5x-v2.obj");
 	//mars.loadModel("geo/moon-houdini.obj");
-	//mars.loadModel("geo/Mountain/Mountain.obj");
+	mars.loadModel("geo/Mountain/Mountain.obj");
 	//mars.loadModel("geo/Park/Park.obj");
-	mars.loadModel("geo/Alien/Alien.obj");
+	//mars.loadModel("geo/Alien/Alien.obj");
 
 	mars.setScaleNormalization(false);
 
 	/* Player */
 	//player.lander.loadModel("geo/lander.obj");  // Load model
 	player.lander.loadModel("geo/Missile/Missile.obj");
-	player.setPosition(0, 10, 0);
+	player.setPosition(10, 50, 0);
 	float scaleFactor = 0.25;
 	player.scale = glm::vec3(scaleFactor, scaleFactor, scaleFactor);
 	player.lander.setScaleNormalization(false);

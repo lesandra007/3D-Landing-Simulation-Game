@@ -75,6 +75,9 @@ public:
 	/* Update position, velocity, and acceleration with Euler's method */
 	void integrate() {
 
+		/* Gravity */
+		//forces += gravityForce();
+
 		/* Linear integration */
 
 		// interval for this step
@@ -132,6 +135,10 @@ public:
 	/* Return the lift force that propells the player upward */
 	glm::vec3 liftForce() {
 		return glm::vec3(0, speed, 0);
+	}
+
+	glm::vec3 gravityForce() {
+		return glm::vec3(0, -1.62f, 0);
 	}
 
 	/* Rotate player counterclockwise */
