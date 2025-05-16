@@ -76,7 +76,7 @@ public:
 	void integrate() {
 
 		/* Gravity */
-		//forces += gravityForce();
+		forces += gravityForce();
 
 		/* Linear integration */
 

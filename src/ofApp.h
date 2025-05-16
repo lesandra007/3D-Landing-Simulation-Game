@@ -36,10 +36,10 @@ class ofApp : public ofBaseApp{
 		void setCameraTarget();
 		bool mouseIntersectPlane(ofVec3f planePoint, ofVec3f planeNorm, ofVec3f &point);
 		bool raySelectWithOctree(ofVec3f &pointRet);
-		glm::vec3 ofApp::getMousePointOnPlane(glm::vec3 p , glm::vec3 n);
+		glm::vec3 getMousePointOnPlane(glm::vec3 p , glm::vec3 n);
 		float getAltitude();
 
-		CameraSystem cameraSystem = CameraSystem(true); //remember to change if using diff terrain
+		CameraSystem cameraSystem = CameraSystem(false); //remember to change if using diff terrain
 		void switchCameraMode(CameraSystem::CameraMode mode);
 		//void drawCameraInfo();
 
@@ -122,4 +122,7 @@ class ofApp : public ofBaseApp{
 		ofSoundPlayer backgroundMusic;
 		bool bThrustPlaying = false;
 		bool isMoving = false;
+
+		ofImage backgroundImage;
+		bool bBackgroundLoaded;
 };
