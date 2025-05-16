@@ -7,7 +7,7 @@
 // 
 //  Copyright (c) by Kevin M. Smith
 //  Copying or use without permission is prohibited by law. 
-//
+//	
 
 
 #include "Octree.h"
@@ -142,10 +142,9 @@ void Octree::create(const ofMesh & geo, int numLevels) {
 		//
 	}
 
-	// recursively buid octree
-	//
-	level++;
+	// recursively build octree
     subdivide(mesh, root, numLevels, level);
+	
 }
 
 
@@ -156,97 +155,121 @@ void Octree::create(const ofMesh & geo, int numLevels) {
 //     1) subdivide box in node into 8 equal side boxes - see helper function subDivideBox8().
 //     2) For each child box
 //            sort point data into each box  (see helper function getMeshFacesInBox())
-//        if a child box contains at list 1 point
+//        if a child box contains at least 1 point
 //            add child to tree
 //            if child is not a leaf node (contains more than 1 point)
 //               recursively call subdivide(child)
 //         
 //      
              
-void Octree::subdivide(const ofMesh& mesh, TreeNode& node, int numLevels, int level) {
+void Octree::subdivide(const ofMesh & mesh, TreeNode & node, int numLevels, int level) {
+	// return if all levels have been divided
 	if (level >= numLevels) return;
 
-	// Create 8 child boxes
-	vector<Box> childBoxes;
-	subDivideBox8(node.box, childBoxes);
+	// subdvide algorithm implemented here
+	// 1) subdivide box in node into 8 equal side boxes
+	vector<Box> boxList; 
+	subDivideBox8(node.box, boxList);
 
-	// For each child box, determine which points are inside
-	for (int i = 0; i < childBoxes.size(); i++) {
-		TreeNode child;
-		child.box = childBoxes[i];
-
-		// Sort points into the child box
-		if (!bUseFaces) {
-			// Using vertices (points)
-			getMeshPointsInBox(mesh, node.points, child.box, child.points);
-		}
-		else {
-			// Using faces
-			getMeshFacesInBox(mesh, node.points, child.box, child.points);
-		}
-
-		// If this child contains at least one point, add it to the node's children
-		if (child.points.size() > 0) {
-			node.children.push_back(child);
-
-			// If this is not a leaf node (more than one point), recursively subdivide
-			if (child.points.size() > 1) {
-				subdivide(mesh, node.children[node.children.size() - 1], numLevels, level + 1);
+	// 2) for each child box:
+	for (Box abox : boxList){
+		// sort point data into each box
+		vector<int> pointIndices;
+		int pointsInBox = getMeshPointsInBox(mesh, node.points, abox, pointIndices);
+		// if a child box contains at least 1 point
+		if (pointsInBox >= 1) {
+			// add child to tree
+			node.children.emplace_back();
+			TreeNode& child = node.children.back();
+			child.box = abox;
+			child.points = pointIndices;
+			// if child is not a leaf node(contains more than 1 point)
+			if (pointsInBox > 1) {
+				// recursively call subdivide(child)
+				subdivide(mesh, child, numLevels, level + 1);
 			}
 		}
 	}
 }
 
 // Implement functions below for Homework project
-//
+// 
 
-bool Octree::intersect(const Ray& ray, const TreeNode& node, TreeNode& nodeRtn) {
-	// First check if ray intersects the node's bounding box
-	if (!node.box.intersect(ray, -1000000, 1000000)) {
-		return false;  // No intersection with this node
+/* Ray-box intersection */
+bool Octree::intersect(const Ray &ray, const TreeNode & node, TreeNode & nodeRtn) {
+
+	// return false if ray does NOT intersect with node's bounding box
+	if (!node.box.intersect(ray, 0, FLT_MAX)) {
+		return false;
 	}
 
-	// If this is a leaf node (contains only one point), return it
+	// if node is a leaf node (contains 1 point)
 	if (node.points.size() == 1) {
+		// return node in nodeRtn
 		nodeRtn = node;
+		// return true (end method call)
 		return true;
 	}
 
-	// If not leaf, check children recursively
-	bool found = false;
-	for (int i = 0; i < node.children.size(); i++) {
-		if (intersect(ray, node.children[i], nodeRtn)) {
-			found = true;
-			break;  // Return the first intersection found
+	// else for each child of node,
+	for (TreeNode child : node.children) {
+		// recursively call intersect(child)
+		if (intersect(ray, child, nodeRtn)) {
+			// return true once the ray intersects with a decendant's bounding box
+			return true;
 		}
 	}
 
-	return found;
+	// return false if ray doesn't intersect with any children's bounding box
+	return false;
 }
 
-bool Octree::intersect(Box& box, TreeNode& node, vector<Box>& boxListRtn) {
-	if (!box.overlap(node.box)) {
-		return false;  // No intersection with this node
+/* Box-box intersection */
+bool Octree::intersect(const Box &box, TreeNode & node, vector<Box> & boxListRtn) {
+
+	// return false if box does NOT intersect with node's bounding box
+	if (!node.box.overlap(box)) {
+		return false;
 	}
 
-	boxListRtn.push_back(node.box);
-	bool intersects = true;
-	for (int i = 0; i < node.children.size(); i++) {
-		intersect(box, node.children[i], boxListRtn);
+	// if node is a leaf node (contains 1 point)
+	if (node.points.size() == 1) {
+		// return node's bounding box in boxListRtn
+		boxListRtn.push_back(node.box);
+		// return true (end method call)
+		return true;
 	}
 
-	return intersects;
+	bool intersection = false;
+
+	// else for each child,
+	for (TreeNode child : node.children) {
+		// recursively call intersect(child)
+		if (intersect(box, child, boxListRtn)) {
+			// set intersection to true if box intersects with a decendant's bounding box
+			intersection = true;
+		}
+	}
+
+	// return true if box intersects with a children's bounding box, otherwise return false
+	return intersection;
 }
 
-void Octree::draw(TreeNode& node, int numLevels, int level) {
-	if (level > numLevels) return;
-	// Draw current node's box
-	ofNoFill();
+void Octree::draw(TreeNode & node, int numLevels, int level, vector<ofColor> colors) {
+	// return if all levels have been drawn
+	if (level >= numLevels) {
+		return;
+	}
+
+	// set color according to level
+	ofSetColor(colors[level]);
+	// draw level
 	drawBox(node.box);
-
-	// Recursively draw children
-	for (int i = 0; i < node.children.size(); i++) {
-		draw(node.children[i], numLevels, level + 1);
+	// increment level
+	level++;
+	for (TreeNode child : node.children) {
+		// recursively call draw(child)
+		draw(child, numLevels, level, colors);
 	}
 }
 

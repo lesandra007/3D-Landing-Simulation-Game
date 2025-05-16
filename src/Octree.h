@@ -28,10 +28,10 @@ public:
 	void create(const ofMesh & mesh, int numLevels);
 	void subdivide(const ofMesh & mesh, TreeNode & node, int numLevels, int level);
 	bool intersect(const Ray &, const TreeNode & node, TreeNode & nodeRtn);
-	bool intersect(Box &, TreeNode & node, vector<Box> & boxListRtn);
-	void draw(TreeNode & node, int numLevels, int level);
-	void draw(int numLevels, int level) {
-		draw(root, numLevels, level);
+	bool intersect(const Box &, TreeNode & node, vector<Box> & boxListRtn);
+	void draw(TreeNode & node, int numLevels, int level, vector<ofColor> colors);
+	void draw(int numLevels, int level, vector<ofColor> colors) {
+		draw(root, numLevels, level, colors);
 	}
 	void drawLeafNodes(TreeNode & node);
 	static void drawBox(const Box &box);

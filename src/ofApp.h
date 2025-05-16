@@ -4,6 +4,8 @@
 #include "ofxGui.h"
 #include  "ofxAssimpModelLoader.h"
 #include "Octree.h"
+#include "Player.h"
+#include "CameraSystem.h"
 #include <glm/gtx/intersect.hpp>
 
 
@@ -24,8 +26,6 @@ class ofApp : public ofBaseApp{
 		void mouseEntered(int x, int y);
 		void mouseExited(int x, int y);
 		void windowResized(int w, int h);
-		void dragEvent2(ofDragInfo dragInfo);
-		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		void drawAxis(ofVec3f);
 		void initLightingAndMaterials();
@@ -36,13 +36,19 @@ class ofApp : public ofBaseApp{
 		void setCameraTarget();
 		bool mouseIntersectPlane(ofVec3f planePoint, ofVec3f planeNorm, ofVec3f &point);
 		bool raySelectWithOctree(ofVec3f &pointRet);
-		void timingButtonPressed();
+		glm::vec3 getMousePointOnPlane(glm::vec3 p , glm::vec3 n);
+		float getAltitude();
 
-		glm::vec3 ofApp::getMousePointOnPlane(glm::vec3 p , glm::vec3 n);
+		CameraSystem cameraSystem = CameraSystem(false); //remember to change if using diff terrain
+		void switchCameraMode(CameraSystem::CameraMode mode);
+		//void drawCameraInfo();
 
-		ofEasyCam cam;
-		ofxAssimpModelLoader mars, lander;
+		ofxAssimpModelLoader mars; //lander
 		ofLight light;
+		ofLight mainLight;          // Primary light source
+		ofLight fillLight;          // Secondary fill light
+		ofLight rimLight;           // Rim/back light for highlighting edges
+
 		Box boundingBox, landerBounds;
 		Box testBox;
 		vector<Box> colBoxList;
@@ -51,11 +57,11 @@ class ofApp : public ofBaseApp{
 		TreeNode selectedNode;
 		glm::vec3 mouseDownPos, mouseLastPos;
 		bool bInDrag = false;
-		ofxButton timingbButton;
+
+
 		ofxIntSlider numLevels;
 		ofxPanel gui;
 
-		bool timing = false;
 		bool bAltKeyDown;
 		bool bCtrlKeyDown;
 		bool bWireframe;
@@ -64,20 +70,59 @@ class ofApp : public ofBaseApp{
 		bool bHide;
 		bool pointSelected = false;
 		bool bDisplayLeafNodes = false;
-		bool bDisplayOctree = false;
+		bool bDisplayOctree = true;
 		bool bDisplayBBoxes = false;
-		bool isCollided = false;
-		bool up = false;
+		
 		bool bLanderLoaded;
 		bool bTerrainSelected;
-
-		float octreeBuildTime;
-		float rayIntersectionTime;
-
+	
 		ofVec3f selectedPoint;
 		ofVec3f intersectPoint;
 
 		vector<Box> bboxList;
 
 		const float selectionRange = 4.0;
+
+
+		vector<ofColor> colors;
+
+		bool bReverse;
+		glm::vec3 landerLastPos;
+
+		ofxToggle timingToggle;
+		bool bTimingInfo = true;
+
+		// window dimensions
+		int windowWidth;
+		int windowHeight;
+
+		// player
+		Player player;
+
+		// keymap
+		map<int, bool> keymap;
+
+		// altitude
+		bool bShowAltitude = true;
+
+		// fonts
+		ofTrueTypeFont font;
+		char altitudeStr[30];
+
+		// fuel
+		ofColor fuelBarColor;
+		ofColor fuelBarBgColor;
+		int fuelBarWidth;
+		int fuelBarHeight;
+		int fuelBarPosX;
+		int fuelBarPosY;
+
+		/* Sound players */
+		ofSoundPlayer thrustSound;
+		ofSoundPlayer backgroundMusic;
+		bool bThrustPlaying = false;
+		bool isMoving = false;
+
+		ofImage backgroundImage;
+		bool bBackgroundLoaded;
 };
