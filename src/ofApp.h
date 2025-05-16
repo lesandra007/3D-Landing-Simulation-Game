@@ -86,7 +86,7 @@ class ofApp : public ofBaseApp{
 
 		vector<ofColor> colors;
 
-		bool bReverse;
+		bool bReverse = false;
 		glm::vec3 landerLastPos;
 
 		ofxToggle timingToggle;

@@ -278,9 +278,13 @@ void ofApp::update() {
 		}
 
 		// Calculate impulse force
-		float impulseScale = 0.05f;
+		float impulseScale = 0.5f;
 		glm::vec3 impulseForce = glm::reflect(landerVelocity, avgCollisionNormal) * impulseScale;
+		cout << "impulse force length" << glm::length(impulseForce) << endl;
 		player.forces += impulseForce;
+		if (colBoxList.size() < 1) {
+			bReverse = false;
+		}
 	}
 
 	player.update();
