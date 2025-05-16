@@ -50,8 +50,8 @@ void ofApp::setup(){
 	/* Terrain */
 	//mars.loadModel("geo/mars-low-5x-v2.obj");
 	//mars.loadModel("geo/moon-houdini.obj");
-	//mars.loadModel("geo/Operation/Operation.obj");
-	mars.loadModel("geo/Park/Park.obj");
+	//mars.loadModel("geo/Park/Park.obj");
+	mars.loadModel("geo/Alien/Alien.obj");
 	//mars.loadModel("geo/Mountain/Mountain.obj");
 	
 	mars.setScaleNormalization(false);
@@ -189,7 +189,6 @@ void ofApp::update() {
 		}
 		else if (cameraSystem.getCurrentMode() == CameraSystem::CameraMode::ONBOARD_CAMERA) {
 			glm::vec3 playerPos = player.getPosition();
-			cout << playerPos;
 			glm::vec3 playerForward = player.heading();
 			glm::vec3 playerUp = glm::vec3(0, 1, 0);
 			cameraSystem.updateOnboardCamera(playerPos, playerForward, playerUp);
@@ -666,39 +665,46 @@ void ofApp::gotMessage(ofMessage msg){
 // setup basic ambient lighting in GL  (for now, enable just 1 light)
 //
 void ofApp::initLightingAndMaterials() {
+	// Common ambient and diffuse properties
+	static float ambient[] = { .5f, .5f, .5f, 1.0f };
+	static float diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	static float lmodel_ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	static float lmodel_twoside[] = { GL_TRUE };
 
-	static float ambient[] =
-	{ .5f, .5f, .5, 1.0f };
-	static float diffuse[] =
-	{ 1.0f, 1.0f, 1.0f, 1.0f };
-
-	static float position[] =
-	{5.0, 5.0, 5.0, 0.0 };
-
-	static float lmodel_ambient[] =
-	{ 1.0f, 1.0f, 1.0f, 1.0f };
-
-	static float lmodel_twoside[] =
-	{ GL_TRUE };
-
-
+	// Main light (LIGHT0) - Key light
+	static float position0[] = { 100.0f, 120.0f, 80.0f, 0.0f };
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
-	glLightfv(GL_LIGHT0, GL_POSITION, position);
+	glLightfv(GL_LIGHT0, GL_POSITION, position0);
 
-	glLightfv(GL_LIGHT1, GL_AMBIENT, ambient);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse);
-	glLightfv(GL_LIGHT1, GL_POSITION, position);
+	// Fill light (LIGHT1) - Softer, fills shadows
+	static float ambient1[] = { 0.3f, 0.3f, 0.4f, 1.0f };
+	static float diffuse1[] = { 0.6f, 0.6f, 0.8f, 1.0f };
+	static float position1[] = { -150.0f, 70.0f, 10.0f, 0.0f };
+	glLightfv(GL_LIGHT1, GL_AMBIENT, ambient1);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse1);
+	glLightfv(GL_LIGHT1, GL_POSITION, position1);
 
+	// Rim light (LIGHT2) - Highlights edges, creates separation
+	static float ambient2[] = { 0.2f, 0.15f, 0.1f, 1.0f };
+	static float diffuse2[] = { 0.8f, 0.7f, 0.55f, 1.0f };
+	static float position2[] = { -30.0f, 50.0f, -180.0f, 0.0f };
+	glLightfv(GL_LIGHT2, GL_AMBIENT, ambient2);
+	glLightfv(GL_LIGHT2, GL_DIFFUSE, diffuse2);
+	glLightfv(GL_LIGHT2, GL_POSITION, position2);
 
+	// Global lighting model settings
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
 	glLightModelfv(GL_LIGHT_MODEL_TWO_SIDE, lmodel_twoside);
 
+	// Enable lighting
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-//	glEnable(GL_LIGHT1);
+	glEnable(GL_LIGHT1);
+	glEnable(GL_LIGHT2);
+
 	glShadeModel(GL_SMOOTH);
-} 
+}
 
 void ofApp::savePicture() {
 	ofImage picture;
@@ -743,7 +749,6 @@ void ofApp::switchCameraMode(CameraSystem::CameraMode mode) {
 	if (mode == CameraSystem::CameraMode::ONBOARD_CAMERA && bLanderLoaded) {
 		// Update onboard camera position and orientation based on player
 		glm::vec3 playerPos = player.getPosition();
-		cout << playerPos;
 		glm::vec3 playerForward = player.heading();
 		glm::vec3 playerUp = glm::vec3(0, 1, 0); // Assuming Y is up
 		cameraSystem.updateOnboardCamera(playerPos, playerForward, playerUp);
