@@ -9,25 +9,32 @@ public:
         EASYCAM
     };
 
-    CameraSystem() {
+    CameraSystem(bool alien) {
         currentMode = EASYCAM;
+        if(alien){ // Mountain and Park
+            camPos = glm::vec3(0, 150, 100);
+        }
+        else{ // Alien
+            camPos = glm::vec3(0, 190, 150);
+        }
 
         // Initialize EasyCam
-        easyCam.setDistance(90);
+        //easyCam.setDistance(190);
         easyCam.setNearClip(0.1);
         easyCam.setFov(65.5);
+        easyCam.setPosition(camPos);
+        easyCam.lookAt(glm::vec3(0, 50, 0));
 
         // Initialize tracking camera
-        trackingCamPos = glm::vec3(30, 30, 30);
+        trackingCamPos = camPos + glm::vec3(0, -20, -20);
         trackingCam.setPosition(trackingCamPos);
         trackingCam.setNearClip(0.1);
         trackingCam.setFov(65.5);
 
         // Initialize onboard camera
-        onboardCamPos = glm::vec3(0, 0, 0);
-        onboardCamOffset = glm::vec3(0, 2, 0); // Position slightly above the lander
+        onboardCamOffset = glm::vec3(0, 0.75, 0); // Position slightly above the lander
         onboardCamDirection = glm::vec3(0, 0, -1); // Looking forward
-        onboardCam.setPosition(onboardCamPos);
+        onboardCam.setPosition(camPos);
         onboardCam.setNearClip(0.1);
         onboardCam.setFov(85); // Wider FOV for onboard camera
     }
@@ -50,13 +57,13 @@ public:
 
     void updateOnboardCamera(const glm::vec3& playerPos, const glm::vec3& playerForward, const glm::vec3& playerUp) {
         // Position the camera on the lander with the given offset
-        onboardCamPos = playerPos + onboardCamOffset;
+        camPos = playerPos + onboardCamOffset;
 
         // Look in the direction specified by onboardCamDirection, transformed based on player orientation
         glm::vec3 lookDir = playerForward;
 
-        onboardCam.setPosition(onboardCamPos);
-        onboardCam.lookAt(onboardCamPos + lookDir, playerUp);
+        onboardCam.setPosition(camPos);
+        onboardCam.lookAt(camPos + lookDir, playerUp);
     }
 
     void begin() {
@@ -121,7 +128,7 @@ public:
     void reset() {
         currentMode = EASYCAM;
 
-        easyCam.setDistance(60);
+        easyCam.setPosition(camPos);
         easyCam.setNearClip(0.1);
         easyCam.setFov(65.5);
 
@@ -131,7 +138,7 @@ public:
         trackingCam.setFov(65.5);
 
         onboardCamDirection = glm::vec3(0, 0, -1); // Looking forward
-        onboardCam.setPosition(onboardCamPos);
+        onboardCam.setPosition(camPos);
         onboardCam.setNearClip(0.1);
         onboardCam.setFov(85); // Wider FOV for onboard camera
     }
@@ -144,7 +151,6 @@ public:
         return easyCam;
     }
 
-public:
     CameraMode currentMode;
     glm::vec3 targetPosition;
 
@@ -157,7 +163,7 @@ public:
 
     // Onboard camera (attached to spaceship)
     ofCamera onboardCam;
-    glm::vec3 onboardCamPos;
+    glm::vec3 camPos;
     glm::vec3 onboardCamOffset;
     glm::vec3 onboardCamDirection;
 };

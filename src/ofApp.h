@@ -39,12 +39,16 @@ class ofApp : public ofBaseApp{
 		glm::vec3 ofApp::getMousePointOnPlane(glm::vec3 p , glm::vec3 n);
 		float getAltitude();
 
-		CameraSystem cameraSystem = CameraSystem();
+		CameraSystem cameraSystem = CameraSystem(true); //remember to change if using diff terrain
 		void switchCameraMode(CameraSystem::CameraMode mode);
 		//void drawCameraInfo();
 
 		ofxAssimpModelLoader mars; //lander
 		ofLight light;
+		ofLight mainLight;          // Primary light source
+		ofLight fillLight;          // Secondary fill light
+		ofLight rimLight;           // Rim/back light for highlighting edges
+
 		Box boundingBox, landerBounds;
 		Box testBox;
 		vector<Box> colBoxList;
