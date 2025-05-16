@@ -52,8 +52,8 @@ void ofApp::setup(){
 	//mars.loadModel("geo/mars-low-5x-v2.obj");
 	//mars.loadModel("geo/moon-houdini.obj");
 	//mars.loadModel("geo/Mountain/Mountain.obj");
-	//mars.loadModel("geo/Park/Park.obj");
-	mars.loadModel("geo/Alien/Alien.obj");
+	mars.loadModel("geo/Park/Park.obj");
+	//mars.loadModel("geo/Alien/Alien.obj");
 
 	mars.setScaleNormalization(false);
 
@@ -707,9 +707,9 @@ void ofApp::gotMessage(ofMessage msg){
 //
 void ofApp::initLightingAndMaterials() {
 	// Common ambient and diffuse properties
-	static float ambient[] = { .5f, .5f, .5f, 1.0f };
-	static float diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	static float lmodel_ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	static float ambient[] = { 0.7f, 0.7f, 0.7f, 1.0f };
+	static float diffuse[] = { 1.2f, 1.2f, 1.2f, 1.0f };
+	static float lmodel_ambient[] = { 1.2f, 1.2f, 1.2f, 1.0f };
 	static float lmodel_twoside[] = { GL_TRUE };
 
 	// Main light (LIGHT0) - Key light
@@ -719,16 +719,16 @@ void ofApp::initLightingAndMaterials() {
 	glLightfv(GL_LIGHT0, GL_POSITION, position0);
 
 	// Fill light (LIGHT1) - Softer, fills shadows
-	static float ambient1[] = { 0.3f, 0.3f, 0.4f, 1.0f };
-	static float diffuse1[] = { 0.6f, 0.6f, 0.8f, 1.0f };
+	static float ambient1[] = { 0.4f, 0.4f, 0.5f, 1.0f };
+	static float diffuse1[] = { 0.8f, 0.8f, 1.0f, 1.0f };
 	static float position1[] = { -150.0f, 70.0f, 10.0f, 0.0f };
 	glLightfv(GL_LIGHT1, GL_AMBIENT, ambient1);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse1);
 	glLightfv(GL_LIGHT1, GL_POSITION, position1);
 
 	// Rim light (LIGHT2) - Highlights edges, creates separation
-	static float ambient2[] = { 0.2f, 0.15f, 0.1f, 1.0f };
-	static float diffuse2[] = { 0.8f, 0.7f, 0.55f, 1.0f };
+	static float ambient2[] = { 0.3f, 0.25f, 0.2f, 1.0f };
+	static float diffuse2[] = { 1.0f, 0.9f, 0.7f, 1.0f };
 	static float position2[] = { -30.0f, 50.0f, -180.0f, 0.0f };
 	glLightfv(GL_LIGHT2, GL_AMBIENT, ambient2);
 	glLightfv(GL_LIGHT2, GL_DIFFUSE, diffuse2);
@@ -746,6 +746,7 @@ void ofApp::initLightingAndMaterials() {
 
 	glShadeModel(GL_SMOOTH);
 }
+
 
 void ofApp::savePicture() {
 	ofImage picture;
