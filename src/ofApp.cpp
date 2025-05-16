@@ -115,6 +115,14 @@ void ofApp::setup(){
 	backgroundMusic.setVolume(0.3f); // Reduced volume for background music
 	backgroundMusic.play(); // Start playing background music immediately
 
+	bBackgroundLoaded = false;
+	if (backgroundImage.load("geo/starbackground.jpg")) {
+		bBackgroundLoaded = true;
+		cout << "Background image loaded successfully" << endl;
+	}
+	else {
+		cout << "Failed to load background image!" << endl;
+	}
 }
  
 //--------------------------------------------------------------
@@ -291,7 +299,12 @@ void ofApp::update() {
 }
 //--------------------------------------------------------------
 void ofApp::draw() {
-	//ofBackground(ofColor::black);
+	ofDisableDepthTest();
+	backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
+
+	// Re-enable depth test and lighting for 3D objects
+	ofEnableDepthTest();
+	ofEnableLighting();
 
 	cameraSystem.begin();
 	ofPushMatrix();
