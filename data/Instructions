@@ -1,0 +1,1 @@
+Go into ofApp.cpp to choose which map you would like, keep in mind if you choose alien you should go into ofApp.h and change cameraSystem(False) to cameraSystem(True)
