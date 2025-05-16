@@ -51,15 +51,16 @@ void ofApp::setup(){
 	/* Terrain */
 	//mars.loadModel("geo/mars-low-5x-v2.obj");
 	//mars.loadModel("geo/moon-houdini.obj");
-	//mars.loadModel("geo/Mountain/Mountain.obj");
-	mars.loadModel("geo/Park/Park.obj");
+	mars.loadModel("geo/Mountain/Mountain.obj");
+	//mars.loadModel("geo/Park/Park.obj");
 	//mars.loadModel("geo/Alien/Alien.obj");
-
+	mars.setRotation(0, 180, 1, 0, 0);
 	mars.setScaleNormalization(false);
 
 	/* Player */
 	//player.lander.loadModel("geo/lander.obj");  // Load model
 	player.lander.loadModel("geo/Missile/Missile.obj");
+	player.lander.setRotation(0, 180, 1, 0, 0);
 	player.setPosition(10, 80, 0);
 	float scaleFactor = 0.25;
 	player.scale = glm::vec3(scaleFactor, scaleFactor, scaleFactor);
@@ -76,7 +77,7 @@ void ofApp::setup(){
 	// create sliders/toggle for testing
 	//
 	gui.setup();
-	gui.add(numLevels.setup("Number of Octree Levels", 1, 1, 10));
+	gui.add(numLevels.setup("Number of Octree Levels", 0, 1, 10));
 	gui.add(timingToggle.setup("Timing Info", true));
 	
 	bHide = false;
@@ -232,12 +233,21 @@ void ofApp::update() {
 	}
 
 	/* Collision */
+	// lander bounds
+	ofVec3f min = player.lander.getSceneMin() + player.getPosition();
+	ofVec3f max = player.lander.getSceneMax() + player.getPosition();
+	Box bounds = Box(Vector3(min.x, min.y, min.z), Vector3(max.x, max.y, max.z));
+
+	// update collision box list
+	colBoxList.clear();
+	octree.intersect(bounds, octree.root, colBoxList);
+
 	// if model is in collided state
-	if (bReverse) {
+	if (colBoxList.size() > 5) {
 		// get lander's current position and velocity
 		glm::vec3 currPos = player.lander.getPosition();
 		glm::vec3 landerVelocity = currPos - landerLastPos;
-		
+		player.pos = landerLastPos; // Snap back to previous valid position  
 		// interval for this step
 		float dt = 1.0 / ofGetFrameRate();
 
@@ -256,7 +266,16 @@ void ofApp::update() {
 		}
 		// calculate the averge normal from all the contact points
 		glm::vec3 avgCollisionNormal = glm::normalize(collisionNormalSum / numPoints);
+		cout << "Collision Normal: " << avgCollisionNormal.x << ", " << avgCollisionNormal.y << ", " << avgCollisionNormal.z << endl;
 
+		float restitution = 0.85;
+		glm::vec3 impulseForce = (restitution + 1.0) * ((-player.velocity.dot(avgCollisionNormal)) * avgCollisionNormal);
+		cout << "impulse force: " << impulseForce << endl;
+		player.forces += ofGetFrameRate() * impulseForce * 20.0f;
+		//player.forces += glm::vec3(0, 50, 0); // Strong upward force
+		cout << "force: " << player.forces << endl;
+
+		/*
 		// calculate new velocity
 		glm::vec3 reverseVelocity = glm::reflect(landerVelocity, avgCollisionNormal);
 		// ensure the direction of the new velocity  is away from the terrain
@@ -268,24 +287,12 @@ void ofApp::update() {
 		// update lander's position
 		glm::vec3 newPos = currPos + reverseVelocity * dt;
 		player.setPosition(newPos.x, newPos.y, newPos.z);
-
-		// lander bounds
-		ofVec3f min = player.lander.getSceneMin() + player.getPosition();
-		ofVec3f max = player.lander.getSceneMax() + player.getPosition();
-		Box bounds = Box(Vector3(min.x, min.y, min.z), Vector3(max.x, max.y, max.z));
-
-		// update collision box list
-		colBoxList.clear();
-		octree.intersect(bounds, octree.root, colBoxList);
-
-		// if no longer in collision state, stop reversing
-		if (colBoxList.size() < 10) {
-			bReverse = false;
-		}
+		*/
 	}
+	//cout << "Before Integration - Velocity: " << player.velocity << endl;
 
 	player.update();
-
+	//cout << "after Integration - Velocity: " << player.velocity << endl;
 	/* Altitude */
 	if (bShowAltitude) {
 		float agl = getAltitude();
