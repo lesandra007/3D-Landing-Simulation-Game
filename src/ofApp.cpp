@@ -60,7 +60,7 @@ void ofApp::setup(){
 	/* Player */
 	//player.lander.loadModel("geo/lander.obj");  // Load model
 	player.lander.loadModel("geo/Missile/Missile.obj");
-	player.setPosition(0, 10, 0);
+	player.setPosition(10, 80, 0);
 	float scaleFactor = 0.25;
 	player.scale = glm::vec3(scaleFactor, scaleFactor, scaleFactor);
 	player.lander.setScaleNormalization(false);
