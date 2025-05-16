@@ -31,6 +31,12 @@ class Box {
 
 	Vector3 min() { return parameters[0]; }
 	Vector3 max() { return parameters[1]; }
+
+    void changeParameters(const Vector3& min, const Vector3& max) { 
+        parameters[0] = min;
+        parameters[1] = max;
+    }
+
 	const bool inside(const Vector3 &p) {
 		return ((p.x() >= parameters[0].x() && p.x() <= parameters[1].x()) &&
 		     	(p.y() >= parameters[0].y() && p.y() <= parameters[1].y()) &&
@@ -47,13 +53,22 @@ class Box {
 
 	// implement for Homework Project
 	//
-	 bool overlap(const Box &box) {
-		 // check if min corner of this box is before the max of the specifed box && 
-		 //          max corner of this box is after the min of the specifed box for x,y,z coordinates
-		 return ((parameters[0].x() <= box.parameters[1].x() && parameters[1].x() >= box.parameters[0].x()) &&
-				 (parameters[0].y() <= box.parameters[1].y() && parameters[1].y() >= box.parameters[0].y()) &&
-				 (parameters[0].z() <= box.parameters[1].z() && parameters[1].z() >= box.parameters[0].z()));
-	}
+    bool Box::overlap(const Box& box) {
+        // Get min and max points for both boxes
+        const Vector3& min1 = parameters[0];
+        const Vector3& max1 = parameters[1];
+        const Vector3& min2 = box.parameters[0];
+        const Vector3& max2 = box.parameters[1];
+
+        // Check for overlap in all three dimensions
+        // If there's no overlap in any dimension, the boxes don't intersect
+        if (max1.x() < min2.x() || min1.x() > max2.x()) return false;
+        if (max1.y() < min2.y() || min1.y() > max2.y()) return false;
+        if (max1.z() < min2.z() || min1.z() > max2.z()) return false;
+
+        // If we passed all overlap tests, boxes overlap
+        return true;
+    }
 
 	Vector3 center() {
 		return ((max() - min()) / 2 + min());
