@@ -76,7 +76,7 @@ public:
 	void integrate() {
 
 		/* Gravity */
-		//forces += gravityForce();
+		forces += glm::vec3(0, -1.62f, 0);
 
 		/* Linear integration */
 

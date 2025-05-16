@@ -1,4 +1,3 @@
-
 //--------------------------------------------------------------
 //
 //  Kevin M. Smith
@@ -60,7 +59,7 @@ void ofApp::setup(){
 	/* Player */
 	//player.lander.loadModel("geo/lander.obj");  // Load model
 	player.lander.loadModel("geo/Missile/Missile.obj");
-	player.setPosition(10, 50, 0);
+	player.setPosition(10, 80, 0);
 	float scaleFactor = 0.25;
 	player.scale = glm::vec3(scaleFactor, scaleFactor, scaleFactor);
 	player.lander.setScaleNormalization(false);
@@ -115,6 +114,16 @@ void ofApp::setup(){
 	backgroundMusic.setVolume(0.3f); // Reduced volume for background music
 	backgroundMusic.play(); // Start playing background music immediately
 
+	bBackgroundLoaded = false;
+	/*
+	if (backgroundImage.load("geo/starbackground.jpg")) {
+		bBackgroundLoaded = true;
+		cout << "Background image loaded successfully" << endl;
+	}
+	else {
+		cout << "Failed to load background image!" << endl;
+	}
+	*/
 }
  
 //--------------------------------------------------------------
@@ -224,8 +233,17 @@ void ofApp::update() {
 	}
 
 	/* Collision */
+	// lander bounds
+	ofVec3f min = player.lander.getSceneMin() + player.getPosition();
+	ofVec3f max = player.lander.getSceneMax() + player.getPosition();
+	Box bounds = Box(Vector3(min.x, min.y, min.z), Vector3(max.x, max.y, max.z));
+
+	// update collision box list
+	colBoxList.clear();
+	octree.intersect(bounds, octree.root, colBoxList);
+
 	// if model is in collided state
-	if (bReverse) {
+	if (colBoxList.size() >= 10) {
 		// get lander's current position and velocity
 		glm::vec3 currPos = player.lander.getPosition();
 		glm::vec3 landerVelocity = currPos - landerLastPos;
@@ -249,6 +267,8 @@ void ofApp::update() {
 		// calculate the averge normal from all the contact points
 		glm::vec3 avgCollisionNormal = glm::normalize(collisionNormalSum / numPoints);
 
+		/*
+
 		// calculate new velocity
 		glm::vec3 reverseVelocity = glm::reflect(landerVelocity, avgCollisionNormal);
 		// ensure the direction of the new velocity  is away from the terrain
@@ -256,11 +276,17 @@ void ofApp::update() {
 			reverseVelocity *= -1.0f;
 		}
 		glm::vec3 newVelocity = reverseVelocity * 2.0f;
+		
 
 		// update lander's position
 		glm::vec3 newPos = currPos + reverseVelocity * dt;
 		player.setPosition(newPos.x, newPos.y, newPos.z);
+		*/
+		float restitution = 0.85;
+		ofVec3f impulseForce = (restitution + 1.0) * ((-player.velocity.dot(avgCollisionNormal)) * avgCollisionNormal);
+		player.forces += ofGetFrameRate() * impulseForce;
 
+		/*
 		// lander bounds
 		ofVec3f min = player.lander.getSceneMin() + player.getPosition();
 		ofVec3f max = player.lander.getSceneMax() + player.getPosition();
@@ -274,6 +300,8 @@ void ofApp::update() {
 		if (colBoxList.size() < 10) {
 			bReverse = false;
 		}
+		*/
+
 	}
 
 	player.update();
@@ -291,7 +319,12 @@ void ofApp::update() {
 }
 //--------------------------------------------------------------
 void ofApp::draw() {
-	//ofBackground(ofColor::black);
+	ofDisableDepthTest();
+	backgroundImage.draw(0, 0, ofGetWidth(), ofGetHeight());
+
+	// Re-enable depth test and lighting for 3D objects
+	ofEnableDepthTest();
+	ofEnableLighting();
 
 	cameraSystem.begin();
 	ofPushMatrix();
@@ -694,9 +727,9 @@ void ofApp::gotMessage(ofMessage msg){
 //
 void ofApp::initLightingAndMaterials() {
 	// Common ambient and diffuse properties
-	static float ambient[] = { .5f, .5f, .5f, 1.0f };
-	static float diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	static float lmodel_ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	static float ambient[] = { 0.7f, 0.7f, 0.7f, 1.0f };
+	static float diffuse[] = { 1.2f, 1.2f, 1.2f, 1.0f };
+	static float lmodel_ambient[] = { 1.2f, 1.2f, 1.2f, 1.0f };
 	static float lmodel_twoside[] = { GL_TRUE };
 
 	// Main light (LIGHT0) - Key light
@@ -706,16 +739,16 @@ void ofApp::initLightingAndMaterials() {
 	glLightfv(GL_LIGHT0, GL_POSITION, position0);
 
 	// Fill light (LIGHT1) - Softer, fills shadows
-	static float ambient1[] = { 0.3f, 0.3f, 0.4f, 1.0f };
-	static float diffuse1[] = { 0.6f, 0.6f, 0.8f, 1.0f };
+	static float ambient1[] = { 0.4f, 0.4f, 0.5f, 1.0f };
+	static float diffuse1[] = { 0.8f, 0.8f, 1.0f, 1.0f };
 	static float position1[] = { -150.0f, 70.0f, 10.0f, 0.0f };
 	glLightfv(GL_LIGHT1, GL_AMBIENT, ambient1);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse1);
 	glLightfv(GL_LIGHT1, GL_POSITION, position1);
 
 	// Rim light (LIGHT2) - Highlights edges, creates separation
-	static float ambient2[] = { 0.2f, 0.15f, 0.1f, 1.0f };
-	static float diffuse2[] = { 0.8f, 0.7f, 0.55f, 1.0f };
+	static float ambient2[] = { 0.3f, 0.25f, 0.2f, 1.0f };
+	static float diffuse2[] = { 1.0f, 0.9f, 0.7f, 1.0f };
 	static float position2[] = { -30.0f, 50.0f, -180.0f, 0.0f };
 	glLightfv(GL_LIGHT2, GL_AMBIENT, ambient2);
 	glLightfv(GL_LIGHT2, GL_DIFFUSE, diffuse2);
@@ -733,6 +766,7 @@ void ofApp::initLightingAndMaterials() {
 
 	glShadeModel(GL_SMOOTH);
 }
+
 
 void ofApp::savePicture() {
 	ofImage picture;

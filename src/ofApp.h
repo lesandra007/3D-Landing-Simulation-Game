@@ -122,4 +122,7 @@ class ofApp : public ofBaseApp{
 		ofSoundPlayer backgroundMusic;
 		bool bThrustPlaying = false;
 		bool isMoving = false;
+
+		ofImage backgroundImage;
+		bool bBackgroundLoaded;
 };
