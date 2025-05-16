@@ -103,6 +103,18 @@ void ofApp::setup(){
 
 	testBox = Box(Vector3(3, 3, 0), Vector3(5, 5, 2));
 
+	/* Sound */
+	// Load thrust sound for player movement
+	thrustSound.load("geo/sound/thrust.wav");
+	thrustSound.setLoop(true);
+	thrustSound.setVolume(0.7f);
+
+	// Load background music and set it to loop with reduced volume
+	backgroundMusic.load("geo/sound/background.wav");
+	backgroundMusic.setLoop(true);
+	backgroundMusic.setVolume(0.3f); // Reduced volume for background music
+	backgroundMusic.play(); // Start playing background music immediately
+
 }
  
 //--------------------------------------------------------------
@@ -114,87 +126,85 @@ void ofApp::update() {
 	bTimingInfo = timingToggle;
 
 	/* Player */
+	bool isMoving = false; // Track if player is moving to control sound
+
 	if (bLanderLoaded) {
 		// rotate player counterclockwise
 		if (keymap['a']) {
 			//cout << "a key" << endl;
 			player.rotateCounterclockwise();
-			player.diskEmitter.sys->reset();
-			player.diskEmitter.start();
+			isMoving = true;
 		}
 		// rotate player clockwise
 		if (keymap['d']) {
 			//cout << "d key" << endl;
 			player.rotateClockwise();
-			player.diskEmitter.sys->reset();
-			player.diskEmitter.start();
+			isMoving = true;
 		}
 		// move player upward
 		if (keymap['w']) {
 			//cout << "w key" << endl;
 			if (player.fuel > 0) {
 				player.moveUp();
-				player.diskEmitter.sys->reset();
-				player.diskEmitter.start();
-				player.fuel -= player.fuelConsumptionRate; // Consume fuel
-				if (player.fuel < 0) player.fuel = 0;
+				isMoving = true;
 			}
 		}
-		// rotate player clockwise
+		// move player downward
 		if (keymap['s']) {
 			//cout << "s key" << endl;
 			if (player.fuel > 0) {
 				player.moveDown();
-				player.diskEmitter.sys->reset();
-				player.diskEmitter.start();
-				player.fuel -= player.fuelConsumptionRate; // Consume fuel
-				if (player.fuel < 0) player.fuel = 0;
+				isMoving = true;
 			}
 		}
 		// move forward along the heading vector
 		if (keymap[OF_KEY_UP]) {
-			// sound
-			//engine.play();
+			// sound handled separately now
 			//cout << "up arrow" << endl;
 			if (player.fuel > 0) {
 				player.moveForward();
-				player.diskEmitter.sys->reset();
-				player.diskEmitter.start();
-				player.fuel -= player.fuelConsumptionRate; // Consume fuel
-				if (player.fuel < 0) player.fuel = 0;
+				isMoving = true;
 			}
 		}
 		// move backward along the heading vector
 		if (keymap[OF_KEY_DOWN]) {
-			// sound
-			//engine.play();
+			// sound handled separately now
 			//cout << "down arrow" << endl;
 			if (player.fuel > 0) {
 				player.moveBackward();
-				player.diskEmitter.sys->reset();
-				player.diskEmitter.start();
-				player.fuel -= player.fuelConsumptionRate; // Consume fuel
-				if (player.fuel < 0) player.fuel = 0;
+				isMoving = true;
 			}
 		}
 		// move right of the heading vector 
 		if (keymap[OF_KEY_RIGHT]) {
 			if (player.fuel > 0) {
 				player.moveRight();
-				player.diskEmitter.sys->reset();
-				player.diskEmitter.start();
-				player.fuel -= player.fuelConsumptionRate; // Consume fuel
-				if (player.fuel < 0) player.fuel = 0;
+				isMoving = true;
 			}
 		}
 		// move left of the heading vector
 		if (keymap[OF_KEY_LEFT]) {
 			if (player.fuel > 0) {
 				player.moveLeft();
+				isMoving = true;
+			}
+		}
+
+		// Sound handling for thrust
+		if (isMoving) {
+			if (!bThrustPlaying) {
 				player.diskEmitter.sys->reset();
 				player.diskEmitter.start();
 				player.fuel -= player.fuelConsumptionRate; // Consume fuel
 				if (player.fuel < 0) player.fuel = 0;
+				thrustSound.play();
+				bThrustPlaying = true;
+			}
+		}
+		else {
+			if (bThrustPlaying) {
+				thrustSound.stop();
+				bThrustPlaying = false;
 			}
 		}
 

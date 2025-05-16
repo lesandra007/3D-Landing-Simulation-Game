@@ -116,4 +116,10 @@ class ofApp : public ofBaseApp{
 		int fuelBarHeight;
 		int fuelBarPosX;
 		int fuelBarPosY;
+
+		/* Sound players */
+		ofSoundPlayer thrustSound;
+		ofSoundPlayer backgroundMusic;
+		bool bThrustPlaying = false;
+		bool isMoving = false;
 };

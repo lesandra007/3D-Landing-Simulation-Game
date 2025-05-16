@@ -32,7 +32,7 @@ public:
         trackingCam.setFov(65.5);
 
         // Initialize onboard camera
-        onboardCamOffset = glm::vec3(0, 0.75, 0); // Position slightly above the lander
+        onboardCamOffset = glm::vec3(0, 1, 0); // Position slightly above the lander
         onboardCamDirection = glm::vec3(0, 0, -1); // Looking forward
         onboardCam.setPosition(camPos);
         onboardCam.setNearClip(0.1);
@@ -59,11 +59,15 @@ public:
         // Position the camera on the lander with the given offset
         camPos = playerPos + onboardCamOffset;
 
-        // Look in the direction specified by onboardCamDirection, transformed based on player orientation
-        glm::vec3 lookDir = playerForward;
+        // Set the look direction to point at the origin (0,0,0)
+        glm::vec3 lookAtPoint = glm::vec3(0, 0, 0);
 
+        // Calculate the direction vector from camera position to the origin
+        glm::vec3 lookDir = lookAtPoint - camPos;
+
+        // Set up the camera
         onboardCam.setPosition(camPos);
-        onboardCam.lookAt(camPos + lookDir, playerUp);
+        onboardCam.lookAt(lookAtPoint);
     }
 
     void begin() {
