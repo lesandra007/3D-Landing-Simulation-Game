@@ -284,7 +284,7 @@ void ofApp::update() {
 		float impulseScale = 0.5f;
 		glm::vec3 impulseForce = glm::reflect(landerVelocity, avgCollisionNormal) * impulseScale;
 		//cout << "impulse force length" << glm::length(impulseForce) << endl;
-		if (player.isVisible() && glm::length(impulseForce) > 50.f) {
+		if (player.isVisible() && glm::length(impulseForce) > 60.f) {
 			player.breakPlayer();
 			sprintf(scoreStr, "Game Over");
 			bShowScore = true;
@@ -515,11 +515,6 @@ void ofApp::keyPressed(int key) {
 	case 'O':
 	case 'o':
 		bDisplayOctree = !bDisplayOctree;
-		break;
-	case 'q':
-		player.breakPlayer();
-		sprintf(scoreStr, "Game Over");
-		bShowScore = true;
 		break;
 	case 'r':
 		cameraSystem.reset();

@@ -17,3 +17,4 @@ Sandra Le
 - Particle Rendering with Shaders
 - 3D Explosion Effect
 - Collision Detection and Response
+- Video Trailer
