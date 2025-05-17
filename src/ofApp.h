@@ -89,7 +89,7 @@ class ofApp : public ofBaseApp{
 		bool bHide;
 		bool pointSelected = false;
 		bool bDisplayLeafNodes = false;
-		bool bDisplayOctree = true;
+		bool bDisplayOctree = false;
 		bool bDisplayBBoxes = false;
 		
 		/* Timing */
@@ -110,6 +110,7 @@ class ofApp : public ofBaseApp{
 		/* Fonts */
 		ofTrueTypeFont font;
 		char altitudeStr[30];
+		char scoreStr[30];
 
 		/* Fuel */
 		ofColor fuelBarColor;
@@ -128,4 +129,7 @@ class ofApp : public ofBaseApp{
 		/* Background Image */
 		ofImage backgroundImage;
 		bool bBackgroundLoaded;
+
+		/* Score */
+		bool bShowScore = false;
 };

@@ -78,7 +78,7 @@ void ofApp::setup(){
 	gui.add(numLevels.setup("Number of Octree Levels", 1, 1, 10));
 	gui.add(timingToggle.setup("Timing Info", true));
 	
-	bHide = false;
+	bHide = true;
 
 	// colors
 	colors = {ofColor::red, ofColor::orange, ofColor::yellow, ofColor:: green, ofColor::blue, 
@@ -283,13 +283,19 @@ void ofApp::update() {
 		// Calculate impulse force
 		float impulseScale = 0.5f;
 		glm::vec3 impulseForce = glm::reflect(landerVelocity, avgCollisionNormal) * impulseScale;
-		cout << "impulse force length" << glm::length(impulseForce) << endl;
-		if (player.isVisible() && glm::length(impulseForce) > 70.f) {
+		//cout << "impulse force length" << glm::length(impulseForce) << endl;
+		if (player.isVisible() && glm::length(impulseForce) > 50.f) {
 			player.breakPlayer();
+			sprintf(scoreStr, "Game Over");
+			bShowScore = true;
 			player.emitter.forces += impulseForce;
 		}
 		else {
 			player.forces += impulseForce;
+			if (player.isVisible()) {
+				sprintf(scoreStr, "Landed Safely");
+				bShowScore = true;
+			}
 			if (colBoxList.size() < 1) {
 				bReverse = false;
 			}
@@ -394,6 +400,12 @@ void ofApp::draw() {
 		ofSetColor(ofColor::white);
 		font.drawString(altitudeStr, 500, 50);
 	}
+
+	if (bShowScore) {
+		ofSetColor(ofColor::white);
+		font.drawString(scoreStr, 30, 50);
+	}
+
 
 	if (bLanderLoaded) {
 		// Draw background (gray)
@@ -506,6 +518,8 @@ void ofApp::keyPressed(int key) {
 		break;
 	case 'q':
 		player.breakPlayer();
+		sprintf(scoreStr, "Game Over");
+		bShowScore = true;
 		break;
 	case 'r':
 		cameraSystem.reset();
