@@ -78,7 +78,7 @@ void ofApp::setup(){
 	gui.add(numLevels.setup("Number of Octree Levels", 1, 1, 10));
 	gui.add(timingToggle.setup("Timing Info", true));
 	
-	bHide = true;
+	bHide = false;
 
 	// colors
 	colors = {ofColor::red, ofColor::orange, ofColor::yellow, ofColor:: green, ofColor::blue, 
@@ -88,7 +88,9 @@ void ofApp::setup(){
 
 	// Create Octree for testing.
 	uint64_t startBuildTime = ofGetSystemTimeMillis();
-	octree.create(mars.getMesh(0), 20);
+	for (int i = 0; i < mars.getMeshCount(); i++) {
+		octree.create(mars.getMesh(i), 20); // Build octree for each mesh
+	}
 	uint64_t endBuildTime = ofGetSystemTimeMillis();
 
 	// calculate build time

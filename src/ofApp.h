@@ -9,7 +9,6 @@
 #include <glm/gtx/intersect.hpp>
 
 
-
 class ofApp : public ofBaseApp{
 
 	public:
@@ -39,16 +38,19 @@ class ofApp : public ofBaseApp{
 		glm::vec3 getMousePointOnPlane(glm::vec3 p , glm::vec3 n);
 		float getAltitude();
 
+		/* Cameras */
 		CameraSystem cameraSystem = CameraSystem(false); //remember to change if using diff terrain
 		void switchCameraMode(CameraSystem::CameraMode mode);
 		//void drawCameraInfo();
 
-		ofxAssimpModelLoader mars; //lander
+		/* Lights */
 		ofLight light;
 		ofLight mainLight;          // Primary light source
 		ofLight fillLight;          // Secondary fill light
 		ofLight rimLight;           // Rim/back light for highlighting edges
 
+		/* Models */
+		ofxAssimpModelLoader mars;
 		Box boundingBox, landerBounds;
 		Box testBox;
 		vector<Box> colBoxList;
@@ -58,10 +60,27 @@ class ofApp : public ofBaseApp{
 		glm::vec3 mouseDownPos, mouseLastPos;
 		bool bInDrag = false;
 
+		bool bLanderLoaded;
+		bool bTerrainSelected;
 
+		ofVec3f selectedPoint;
+		ofVec3f intersectPoint;
+
+		vector<Box> bboxList;
+
+		const float selectionRange = 4.0;
+
+		vector<ofColor> colors;
+
+		bool bReverse = false;
+		glm::vec3 landerLastPos;
+
+		/* GUI */
 		ofxIntSlider numLevels;
 		ofxPanel gui;
 
+		/* Keys */
+		map<int, bool> keymap;
 		bool bAltKeyDown;
 		bool bCtrlKeyDown;
 		bool bWireframe;
@@ -70,25 +89,10 @@ class ofApp : public ofBaseApp{
 		bool bHide;
 		bool pointSelected = false;
 		bool bDisplayLeafNodes = false;
-		bool bDisplayOctree = false;
+		bool bDisplayOctree = true;
 		bool bDisplayBBoxes = false;
 		
-		bool bLanderLoaded;
-		bool bTerrainSelected;
-	
-		ofVec3f selectedPoint;
-		ofVec3f intersectPoint;
-
-		vector<Box> bboxList;
-
-		const float selectionRange = 4.0;
-
-
-		vector<ofColor> colors;
-
-		bool bReverse = false;
-		glm::vec3 landerLastPos;
-
+		/* Timing */
 		ofxToggle timingToggle;
 		bool bTimingInfo = true;
 
@@ -99,17 +103,15 @@ class ofApp : public ofBaseApp{
 		// player
 		Player player;
 
-		// keymap
-		map<int, bool> keymap;
 
-		// altitude
+		/* Altitude */
 		bool bShowAltitude = true;
 
-		// fonts
+		/* Fonts */
 		ofTrueTypeFont font;
 		char altitudeStr[30];
 
-		// fuel
+		/* Fuel */
 		ofColor fuelBarColor;
 		ofColor fuelBarBgColor;
 		int fuelBarWidth;
@@ -123,6 +125,7 @@ class ofApp : public ofBaseApp{
 		bool bThrustPlaying = false;
 		bool isMoving = false;
 
+		/* Background Image */
 		ofImage backgroundImage;
 		bool bBackgroundLoaded;
 };

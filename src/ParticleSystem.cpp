@@ -3,30 +3,36 @@
 
 #include "ParticleSystem.h"
 
+/* Add particle to system */
 void ParticleSystem::add(const Particle &p) {
 	particles.push_back(p);
 }
 
+/* Add force to system */
 void ParticleSystem::addForce(ParticleForce *f) {
 	forces.push_back(f);
 }
 
+/* Remove particle */
 void ParticleSystem::remove(int i) {
 	particles.erase(particles.begin() + i);
 }
 
+/* Set lifespan of particles */
 void ParticleSystem::setLifespan(float l) {
 	for (int i = 0; i < particles.size(); i++) {
 		particles[i].lifespan = l;
 	}
 }
 
+/* Reset system */
 void ParticleSystem::reset() {
 	for (int i = 0; i < forces.size(); i++) {
 		forces[i]->applied = false;
 	}
 }
 
+/* Update system */
 void ParticleSystem::update() {
 	// check if empty and just return
 	if (particles.size() == 0) return;

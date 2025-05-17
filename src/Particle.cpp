@@ -17,14 +17,14 @@ Particle::Particle() {
 	color = ofColor::aquamarine;
 }
 
+/* Draw default particle */
 void Particle::draw() {
 	//ofSetColor(color);
 	ofSetColor(ofMap(age(), 0, lifespan, 255, 10), 0, 0);
 	ofDrawSphere(position, radius);
 }
 
-// write your own integrator here.. (hint: it's only 3 lines of code)
-//
+// update particle variables for positioning and movement
 void Particle::integrate() {
 
 	

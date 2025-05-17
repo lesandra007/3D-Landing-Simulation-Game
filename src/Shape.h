@@ -87,7 +87,6 @@ public:
 		pos += (velocity * dt);
 
 		// update acceleration with accumulated particles forces
-		// remember :  (f = ma) OR (a = 1/m * f)
 		glm::vec3 accel = acceleration;    // start with any acceleration already on the particle
 		accel += (forces * (1.0 / mass));
 		velocity += accel * dt; // constant for faster decelerations 0.3
@@ -126,6 +125,7 @@ public:
 		return speed * glm::normalize(heading());
 	}
 
+	/* Calculate the lateral force to rotate the player */
 	glm::vec3 lateralForce() {
 		glm::mat4 rotation = glm::rotate(glm::mat4(1.0), glm::radians(-90.0f), glm::vec3(0, 1, 0));
 		glm::vec3 rightDirection = glm::normalize(rotation * glm::vec4(heading(), 0));
@@ -137,6 +137,7 @@ public:
 		return glm::vec3(0, speed, 0);
 	}
 
+	/* Calculate the gravity force that pulls the player downward */
 	glm::vec3 gravityForce() {
 		return glm::vec3(0, -1.62f, 0);
 	}
