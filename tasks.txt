@@ -1,0 +1,19 @@
+Yeng Her
+- Fuel
+- Game Lighting
+- Cameras
+- Sounds
+- Background Image
+- Collision Detection and Response
+- Video Trailer
+- Models
+
+
+
+Sandra Le
+- Landing
+- Vehicle Maneuvering using Physics
+- Altitude Sensor (Above Ground Level)
+- Particle Rendering with Shaders
+- 3D Explosion Effect
+- Collision Detection and Response
