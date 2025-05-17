@@ -33,8 +33,8 @@ public:
 		/* Emitter and Particles */
 		// then set up the emitter forces
 		turbForce = new TurbulenceForce(ofVec3f(-20, -20, -20), ofVec3f(20, 20, 20));
-		gravityForce = new GravityForce(ofVec3f(0, -10, 0));
-		radialForce = new ImpulseRadialForce(20);
+		gravityForce = new GravityForce(ofVec3f(0, -1.62f, 0));
+		radialForce = new ImpulseRadialForce(100);
 
 		// Now add forces to the properly initialized system
 		emitter.sys->addForce(turbForce);
@@ -42,22 +42,11 @@ public:
 		emitter.sys->addForce(radialForce);
 
 		// set up emitter
-		emitter.speed = speed * 5;
-		emitter.torque = torque;
+		emitter.speed = speed * 10;
 		emitter.mass = 1;
-		ofVec3f center = getCenter();
-		emitter.setPosition(glm::vec3(center.x, center.y - 100, center.z));
-		//emitter.setPosition(ofVec3f(0, 100, 0)); // Start with a safe position
-		emitter.setVelocity(velocity);
-		emitter.acceleration = acceleration;
-		emitter.forces = forces;
-		emitter.rot = rot;
-		emitter.angVelocity = angVelocity;
-		emitter.angAcceleration = angAcceleration;
-		emitter.rotForces = rotForces;
 		emitter.setOneShot(true);
 		emitter.setEmitterType(RadialEmitter);
-		emitter.setGroupSize(5000);
+		emitter.setGroupSize(10000);
 		emitter.visible = true;
 
 		/* Thrust Disk Emitter */
@@ -71,7 +60,7 @@ public:
 
 		diskEmitter.radius = 2;
 
-		diskEmitter.setPosition(glm::vec3(pos.x, pos.y-100, pos.z));
+		diskEmitter.setPosition(glm::vec3(pos.x, pos.y-95, pos.z));
 		diskEmitter.setVelocity(velocity);
 		diskEmitter.acceleration = acceleration;
 		diskEmitter.forces = forces;
@@ -133,12 +122,16 @@ public:
 	void breakPlayer() {
 		cout << "breakPlayer" << endl;
 		setVisible(false);
+		ofVec3f center = getCenter();
+		emitter.setPosition(glm::vec3(center.x, center.y - 100, center.z));
 		emitter.sys->reset();
 		emitter.start();
 	}
 
 	void setPosition(float x, float y, float z) {
 		pos = glm::vec3(x, y, z);
+		ofVec3f center = getCenter();
+		emitter.setPosition(glm::vec3(center.x, center.y - 100, center.z));
 	}
 
 	glm::vec3 getPosition() {
@@ -152,11 +145,6 @@ public:
 			ofVec3f center = getCenter();
 
 			/* Collision Radial Emitter */
-			// emitter movement
-			emitter.forces = forces;
-			emitter.rotForces = rotForces;
-			emitter.integrate();
-
 			// spawn particles accordingly
 			emitter.update();
 

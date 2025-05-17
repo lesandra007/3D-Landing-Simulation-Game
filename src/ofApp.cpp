@@ -5,8 +5,8 @@
 //  Octree Test - startup scene
 // 
 //
-//  Student Name:   
-//  Date: 
+//  Student Name: Yeng Her, Sandra Le
+//  Date: May 16, 2025
 
 
 #include "ofApp.h"
@@ -78,7 +78,7 @@ void ofApp::setup(){
 	gui.add(numLevels.setup("Number of Octree Levels", 1, 1, 10));
 	gui.add(timingToggle.setup("Timing Info", true));
 	
-	bHide = false;
+	bHide = true;
 
 	// colors
 	colors = {ofColor::red, ofColor::orange, ofColor::yellow, ofColor:: green, ofColor::blue, 
@@ -241,10 +241,11 @@ void ofApp::update() {
 	colBoxList.clear();
 	octree.intersect(bounds, octree.root, colBoxList);
 
-	if(colBoxList.size() >= 1) {
+	if(colBoxList.size() >= 5) {
 		cout << "Collision detected" << endl;
 		bReverse = true;
 	}
+
 	/* Collision */
 	// if model is in collided state
 	if (bReverse) {
@@ -281,9 +282,15 @@ void ofApp::update() {
 		float impulseScale = 0.5f;
 		glm::vec3 impulseForce = glm::reflect(landerVelocity, avgCollisionNormal) * impulseScale;
 		cout << "impulse force length" << glm::length(impulseForce) << endl;
-		player.forces += impulseForce;
-		if (colBoxList.size() < 1) {
-			bReverse = false;
+		if (player.isVisible() && glm::length(impulseForce) > 70.f) {
+			player.breakPlayer();
+			player.emitter.forces += impulseForce;
+		}
+		else {
+			player.forces += impulseForce;
+			if (colBoxList.size() < 1) {
+				bReverse = false;
+			}
 		}
 	}
 

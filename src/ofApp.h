@@ -70,7 +70,7 @@ class ofApp : public ofBaseApp{
 		bool bHide;
 		bool pointSelected = false;
 		bool bDisplayLeafNodes = false;
-		bool bDisplayOctree = true;
+		bool bDisplayOctree = false;
 		bool bDisplayBBoxes = false;
 		
 		bool bLanderLoaded;
